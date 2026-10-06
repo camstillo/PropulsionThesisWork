@@ -1,0 +1,38 @@
+% F4: Literature search.
+%   - 2 to 3 search questions from Heilmeier v1, each with a keyword set
+%     (with synonyms) and a Boolean query
+%   - the search log (below): at least 3 databases (one of them Web of Science
+%     or Scopus), citation chasing from your two best papers, 1 AI search tool
+%   - a list of your 30 to 50 item Zotero collection, tagged core, related, or
+%     background (any format in F4); open every AI-suggested item before
+%     keeping it
+%   - one paragraph comparing what the AI tool found with what the databases
+%     found
+% F6: add a paragraph of 6 to 8 sentences citing at least 6 papers in IEEE
+% style, with one pinpoint citation, e.g. \cite[Fig.~2]{key}, and one
+% citation of several papers at once, e.g. \cite{key1,key2,key3}.
+
+\section{Literature Search}
+
+\subsection{Search Questions and Queries}
+\textit{[F4: search questions, keyword sets, Boolean queries.]}
+
+\subsection{Search Log}
+% Header row: \tagpdfsetup{table/header-rows={1}} marks the first row as
+% column headers in the tagged PDF. Keep one row per search.
+\tagpdfsetup{table/header-rows={1}}
+\begin{longtable}{@{}p{0.12\linewidth}p{0.17\linewidth}p{0.37\linewidth}rr@{}}
+  \toprule
+  Date & Source & Query or prompt & Hits & Kept \\
+  \midrule
+  \endhead
+  % Example row; replace it with your own searches.
+  2026-10-20 & Web of Science & \texttt{("spiking neural network" OR SNN) AND accelerator AND energy} & 312 & 14 \\
+  \bottomrule
+\end{longtable}
+
+\subsection{Collection}
+\textit{[F4: list of the collection with tags.]}
+
+\subsection{AI Search Compared With Databases}
+\textit{[F4: one paragraph.]}

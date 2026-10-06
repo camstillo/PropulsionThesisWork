@@ -1,0 +1,108 @@
+% ECE 563 research prospectus: course template, Fall 2026
+%
+% One document for the whole term. Each module adds or revises a section.
+% Submit the full PDF every week; the new or changed part is what gets graded.
+%
+%   F1  sections/about_my_research.tex, appendices/ai_use_log.tex
+%   F2  appendices/ai_policy.tex, appendices/assignment_records.tex
+%   F3  sections/heilmeier.tex (v1), appendices/my_material.tex
+%   F4  sections/literature_search.tex
+%   F5  appendices/my_material.tex (citeable notes)
+%   F6  references.bib verified; paragraph in literature_search.tex
+%   F7  sections/literature_review.tex
+%   F8  sections/research_plan.tex
+%   F9  sections/heilmeier.tex (v2), sections/focus_and_outlines.tex
+%   F10 sections/focus_and_outlines.tex (long outline), whole document revised
+%
+% Bibliography: there is exactly one, built from references.bib. Export your
+% Zotero collection with Better BibTeX and upload it here, replacing
+% references.bib, whenever your library changes. (Zotero sync is not available
+% to collaborators on this project.)
+%
+% Tracked edits: when AI drafts a section, first save its draft unchanged as
+% sections/NAME_ai_v0.tex, then edit sections/NAME.tex. The latexmkrc file
+% compares the two on every compile and writes sections/NAME_ai_v0_diff.tex.
+% Show it with \trackededits{NAME_ai_v0} in the "Tracked edits" appendix.
+
+\DocumentMetadata{lang=en-US, pdfversion=2.0, testphase=latest}
+% ^ Makes the PDF tagged (accessible). If Overleaf reports an error on this
+%   line, set Menu > TeX Live version to the newest one; do not delete it.
+
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{cite}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+
+\graphicspath{{figures/}}
+
+% ---------------------------------------------------------------- your details
+\newcommand{\prospectustitle}{Working Title of Your Thesis Research}
+\newcommand{\studentname}{Your Name}
+\newcommand{\degree}{PhD student}    % or: MS thesis student
+\newcommand{\advisorname}{Prof.\ Advisor Name}
+
+\hypersetup{pdftitle={\prospectustitle}, pdfauthor={\studentname}}
+
+% --------------------------------------------- tracked edits (do not change)
+\providecommand{\DIFadd}[1]{{\protect\color{blue}\uline{#1}}}
+\providecommand{\DIFdel}[1]{{\protect\color{red}\sout{#1}}}
+\providecommand{\DIFaddbegin}{}\providecommand{\DIFaddend}{}
+\providecommand{\DIFdelbegin}{}\providecommand{\DIFdelend}{}
+\providecommand{\DIFmodbegin}{}\providecommand{\DIFmodend}{}
+\providecommand{\DIFaddFL}[1]{\DIFadd{#1}}\providecommand{\DIFdelFL}[1]{\DIFdel{#1}}
+\providecommand{\DIFaddbeginFL}{}\providecommand{\DIFaddendFL}{}
+\providecommand{\DIFdelbeginFL}{}\providecommand{\DIFdelendFL}{}
+\usepackage[normalem]{ulem}
+% \trackededits{NAME_ai_v0} prints sections/NAME_ai_v0_diff.tex: blue underlined
+% text is yours, red struck-out text is what you removed from the AI draft.
+\newcommand{\trackededits}[1]{%
+  \subsection*{\texttt{\detokenize{#1}} to final text}
+  \begingroup
+    \renewcommand{\section}[1]{\par\noindent\textbf{##1}\par}%
+    \renewcommand{\subsection}[1]{\par\noindent\textit{##1}\par}%
+    \InputIfFileExists{sections/#1_diff.tex}{}{%
+      \textit{No diff found for \detokenize{#1}. Check that sections/\detokenize{#1}.tex and the final
+      section file both exist, then recompile.}}%
+  \endgroup}
+
+% ---------------------------------------------------------------- document
+\begin{document}
+
+\begin{center}
+  {\Large\bfseries \prospectustitle\par}
+  \vspace{0.6em}
+  {\large Research Prospectus\par}
+  \vspace{0.8em}
+  \studentname\ $\cdot$ \degree, Electrical and Computer Engineering,
+  Portland State University\par
+  Advisor: \advisorname\par
+  ECE 563 Grad School Essentials $\cdot$ Version: Fall 2026\par
+\end{center}
+
+\input{sections/about_my_research}      % F1
+\input{sections/heilmeier}              % F3, revised in F9
+\input{sections/literature_search}      % F4, F6
+\input{sections/literature_review}      % F7
+\input{sections/research_plan}          % F8
+\input{sections/focus_and_outlines}     % F9, F10
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\appendix
+\input{appendices/my_material}          % your own input: what AI drafts from
+\input{appendices/ai_policy}            % F2, revised in W9
+\input{appendices/assignment_records}   % tables and exercises the checklists ask for
+\input{appendices/tracked_edits}        % latexdiffs from AI drafts to your text
+\input{appendices/ai_use_log}           % always last
+
+\end{document}
