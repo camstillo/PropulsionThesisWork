@@ -40,9 +40,12 @@
 \usepackage{longtable}
 \usepackage{cite}
 \usepackage{xcolor}
+\usepackage{float}
 \usepackage[hidelinks]{hyperref}
 
 \graphicspath{{figures/}}
+% My own personal graphics
+\graphicspath{{/home/ccastillo/Pictures}}
 
 % ---------------------------------------------------------------- your details
 \newcommand{\prospectustitle}{Hardware and Controls Development of a Cubesat Steam Thruster}
@@ -89,20 +92,20 @@
 \end{center}
 
 \input{sections/about_my_research}      % F1
-\input{sections/heilmeier}              % F3, revised in F9
-\input{sections/literature_search}      % F4, F6
-\input{sections/literature_review}      % F7
-\input{sections/research_plan}          % F8
-\input{sections/focus_and_outlines}     % F9, F10
+% \input{sections/heilmeier}              % F3, revised in F9
+% \input{sections/literature_search}      % F4, F6
+% \input{sections/literature_review}      % F7
+% \input{sections/research_plan}          % F8
+% \input{sections/focus_and_outlines}     % F9, F10
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}
 
 \appendix
-\input{appendices/my_material}          % your own input: what AI drafts from
-\input{appendices/ai_policy}            % F2, revised in W9
+%\input{appendices/my_material}          % your own input: what AI drafts from
+%\input{appendices/ai_policy}            % F2, revised in W9
 \input{appendices/assignment_records}   % tables and exercises the checklists ask for
-\input{appendices/tracked_edits}        % latexdiffs from AI drafts to your text
+% \input{appendices/tracked_edits}        % latexdiffs from AI drafts to your text
 \input{appendices/ai_use_log}           % always last
 
 \end{document}
