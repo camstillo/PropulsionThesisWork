@@ -1,4 +1,4 @@
-% F2: My AI policy, about half a page. Discuss it with your advisor in F3;
+%No AI used for this assignment F2: My AI policy, about half a page. Discuss it with your advisor in F3;
 % revise it at the end of ECE 564 (W9). Cover:
 %   - which AI tools you will use, and for what
 %   - what you will never upload (co-authors' unpublished work, manuscripts
@@ -8,4 +8,21 @@
 
 \section{My AI Policy}
 
-\textit{[F2: Write your policy.]}
+\subsection{My AI Use Policy}
+
+I plan to use AI tools for two tasks: writing boilerplate code and getting answers to broad questions. In the former case, I end up generally having to write many plots for the things I do. Before AI was very powerful, I was writing a lot of matplotlib code by hand. This was good because I learned a lot about how matplotlib works. Unfortunately, it took a lot of time because most of the code is the same between projects, but just different enough that copy-and-paste still took time. AI has been a time saver in this regard for pretty much exactly the same results. I always review the results of what it outputs and whether it's using the right data for the plots (I've run into cases where the AI forces a function to output the correct thing).
+
+In terms of asking questions, my general strategy is to get overviews from the AI, then use that info to look at real sources. Much of the time, I'm not an expert in the things I'm researching, and AI can be a great place to start since it can answer my questions without too much dense notation. I get get a broad understanding about the questions I have before digging into real sources. I never use it for writing anything I'm going to turn in, notes for myself, or specific insights it has. It's still not great at doing math, but is pretty good at making overviews. It also brings up things I would not think of around subjects that I'm not familiar with, which helps me expand the scope of my search and knowledge.
+
+I've tried to use AI in the past for finding papers, but it is not good at this. I find that even asking very specific questions, it will mostly pull bad data. When I do research, I carefully evaluate papers and read entirely through ones I think are important. I then pull the sources from those papers and expand my reading list. AI does not do that. I tried to make a research assistant bot that would pull down papers and summarize them so that I got a broad overview of papers that had better summaries than the abstracts did. I think this could have been useful for me to sort papers, as sometimes research is too targeted or the abstract misleads one about the content of the paper. Instead, it ended up pulling a few papers I already had, and the rest of them were pretty far off topic from what I was looking for.
+
+Finally, I will take into consideration any of the data I'm pushing up to an AI tool before using it. I don't think this will be a problem for anything that I'm doing, since AI can mostly write processing scripts without directly handling the data.
+
+
+\subsection{AI Tools}
+
+\begin{itemize}
+    \item Claude Opus/Sonnet: General agent used for planning complex tasks, analyzing code, and answering questions. I generally use Opus when asking in-depth questions and Sonnet when I have a lot of material to get through.
+    \item GLM 5.3/5.3-flash: This is, in my opinion, one of my favorite budget agents for doing work. It has a surprising amount of capability. A lot of time, I will intentionally write messy code to move quickly, then have an agent running this model come behind me to clean it up. I also use it to outline plots that I then go in and update to my stylistic preferences.
+    \item Opencode: My preferred agent handler. I generally use linux for programming tasks, and AI integrates best as a CLI tool in my popinion. Opencode gives me a lot of control over agents and how they do work.
+\end{itemize}

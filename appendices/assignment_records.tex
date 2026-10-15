@@ -24,7 +24,12 @@ Repository: \url{https://github.com/camstillo/PropulsionThesisWork}\par
 \end{figure}
 
 \subsection{F2: Ethics Cases, Reference Check, Reflection}
-\textit{[Case judgments (a) to (f), each with the principle at stake.]}
+\begin{enumerate}
+    \item \textbf{A student submits a paragraph drafted by an AI tool without saying so.} I am a little unsure about the exact meaning of this. By draft, does that mean that the student had help on an initial attempt at a paragraph, or that a paragraph in a research paper is directly created by AI. The latter of these cases must be disclosed and could be considered misuse, as the AI can utilize false data from the supposed text of some paper. Even if it does not directly cite something, it could still paraphrase some work, which could be considered academic plagiarism. In the former case, AI might assist in writing an initial draft, only for a researcher to come back with real data, citations, and knowledge of the field and ensure the correctness of the paragraph. The utility of that action is somewhat dubious though, as the work required to find citations and fit them into the narrative flow of the paper would probably be more significant than the time saved on stylistic changes.
+    \item \textbf{A student drops three outliers from a plot and does not mention it.} This could be okay, since they may have experimental knowledge that confirms those particular data points are invalid to the question being answered. I could see where one might get into trouble with this if the data was statistically significant to the point that excluding it would invalidate the results of the test. In either case, I would argue that any outliers dropped should probably be noted somewhere in the work.
+    \item \textbf{A student reuses two paragraphs from their own published paper in a new manuscript, without quotation marks or citation.} The work was previously published, so this is certainly plagiarism. One always must cite their information, even if they are the source. If information is to be traceable, it is important to ensure that someone can consistently follow the logic of the paper.
+    \item \textbf{A student uploads a labmate's unpublished dataset to a chatbot to get help with the analysis.} Chatbots are entirely insecure, and the unpublished data may end up in unscrupulous hands. Many labs would consider this a violation of data security, as the data could have personally-identifiable information. I would confirm that the dataset is okay to use within a chatbot before using any AI analysis of the data.
+\end{enumerate}
 
 \tagpdfsetup{table/header-rows={1}}
 \begin{longtable}{@{}p{0.06\linewidth}p{0.22\linewidth}p{0.08\linewidth}p{0.08\linewidth}p{0.12\linewidth}p{0.32\linewidth}@{}}
@@ -32,10 +37,27 @@ Repository: \url{https://github.com/camstillo/PropulsionThesisWork}\par
   \# & Reference (tool) & Exists & DOI resolves & Author, venue, year correct & Supports the claim? (passage read) \\
   \midrule
   \endhead
-  1 & \textit{[reference] (tool A)} & & & & \\
+    1 & Alexeenko, A. A., Levin, D. A., Gimelshein, S. F., Collins, R. J., \& Reed, B. D. (2002). "Numerical Modeling of Axisymmetric and Three-Dimensional Flows in Microelectromechanical Systems Nozzles." AIAA Journal, 40(5), 897-904. \textit{Opencode: Gemini-4} & Yes & Yes & Correct & Yes (first page) \\
+    2 & Ketsdever, A. D., Clabough, M. T., Gimelshein, S. F., \& Alexeenko, A. A. (2005). "Experimental and Numerical Determination of Micropropulsion Device Efficiencies at Low Reynolds Numbers." AIAA Journal, 43(3), 633-641. \textit{Opencode: Gemini-4} & Yes & Yes & Correct & Yes (first page) \\
+    3 & Pearl, J. M., Louisos, W. F., \& Hitt, D. L. (2017). "Thrust Calculation for Low-Reynolds-Number Micronozzles." Journal of Spacecraft and Rockets, 54(1), 299-303. \textit{Opencode: Gemini-4} & Yes & Yes & Correct & Yes (first page) \\
+    4 & Nishii, K., Koizumi, H., \& Komurasaki, K. (2021). "Experimental Characterization of Nozzle Performance at Low Reynolds Numbers for Water Microthrusters." Journal of Propulsion and Power, 37(4), 595-603. \textit{Opencode: Gemini-4} & Yes & Yes & Correct & Yes (first page) \\
+    5 & Li, X., Liang, H., Zhang, R., Yao, W., \& Chen, X. (2023). "Multiphysics Numerical Simulation and Geometric Optimization of a Micronozzle for the MEMS Thruster." Space: Science \& Technology, 3, Article 0032. \textit{Opencode: Gemini-4} & Yes & Yes & Correct & Yes (first page) \\
+    6 & Grisnik, S. P., Smith, T. A., \& Saltz, L. E. "Experimental Study of Low Reynolds Number Nozzles." AIAA Paper 87-0992; also NASA Technical Memorandum 89858. \textit{Opencode: GPT-6.1 Sol} & Yes & Yes & Correct (missing year) & No (written before first paper on this subject) \\
+    7 & Ketsdever, A. D., Clabough, M. T., Gimelshein, S. F., \& Alexeenko, A. "Experimental and Numerical Determination of Micropropulsion Device Efficiencies at Low Reynolds Numbers." AIAA Journal, 43(3), 633-641. \textit{Opencode: GPT-6.1 Sol} & Yes & Yes & Correct  (missing year) & Yes (first page) \\
+    8 & Liu, M., Zhang, X., Zhang, G., \& Chen, Y. "Study on Micronozzle Flow and Propulsion Performance Using DSMC and Continuum Methods." Acta Mechanica Sinica, 22(5), 409-416. \textit{Opencode: GPT-6.1 Sol} & Yes & Yes & Correct (missing year) & No (does not directly establish information) \\
+    9 & Zilic, A., Hitt, D. L., \& Alexeenko, A. A. "Numerical Simulations of Supersonic Flow in a Linear Aerospike Micro Nozzle." AIAA Paper 2007-3984.\textit{Opencode: GPT-6.1 Sol} & Yes & Yes & Correct & No (does not directly establish information) \\
+    10 & Li, X., Liang, H., Zhang, R., Yao, W., \& Chen, X. "Multiphysics Numerical Simulation and Geometric Optimization of a Micronozzle for the MEMS Thruster." Space: Science \& Technology, 3, Article 0032.\textit{Opencode: GPT-6.1 Sol} & Yes & Yes & Correct (missing year) & Yes (first page) \\
   \bottomrule
 \end{longtable}
-\textit{[Success rate per tool. Reflection, about half a page.]}
+
+I was pretty surpised that there was not a single error in the DOIs. Looks like the success rate for gemini was 100\%, whereas GPT-6.1 failed on 60\% of the listings. I wonder if the tools other people are using are worse than mine if they're not getting as good of results. My tool, opencode, allows agents to call out to Exa or other web search platforms to search for these references. They aren't stuck with whatever's in their weights, and I specifically asked them to do that in the prompt. I got much better results this way.
+
+As far as the content of these papers, I find their content somewhat off-course. Gemini returned quite a few relevant papers, which makes sense since it is more geared towards search and selection of materials. GPT-6.1 did poorly, as it seemed to just take the first few options from the search and gave me back a bunch of stuff that wasn't that relevant. I would like to see this do slightly better by maybe summarizing some of the papers first before coming back to me. I could see how that would be useful, as it could read the text for each paper and decide if it answers the question asked directly. There are tools to convert PDFs to text, which could be useful for something like this.
+
+I also picked an easy question to answer, as there are quite a few sources out there which talk about this. It's such common knowledge that almost all the Gemini sources described the relationship within the introduction paragraph or the abstract. The GPT-6.1 papers had more tangential relationships with the question I asked, and were slightly more lacking in substantive content involving the question.
+
+If I were to use this for real research, I probably wouldn't attempt to use an AI tool to directly cite sources. As shown by this exercise, that seems like a fairly bad idea in the case that something does hallucinate. That being said, having not known a lot about this fact, the research that came back from at least Gemini was fairly close to what I would have searched for personally. These studies were driectly related to the question I asked and would have been fairly informative. Just going to AI to ask for sources is okay so long as I do the work afterwords to properly cite the sources and correctly parse the information contained within. Zotero does that for me anyways, so I'm not loosing that much time.
+
 
 \subsection{F6: Bibliography Verification}
 \tagpdfsetup{table/header-rows={1}}
