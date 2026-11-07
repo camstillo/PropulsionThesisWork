@@ -15,7 +15,27 @@
 \section{Literature Search}
 
 \subsection{Search Questions and Queries}
-\textit{[F4: search questions, keyword sets, Boolean queries.]}
+\textbf{Search Questions}
+\begin{enumerate}
+    \item How have people handled doing the power bus optimization which takes into account probabilistic models for radio usage, ADCS and control power, and propulsion control?
+    \item Can I estimate how much power I'm going to need for the thermal battery to heat the water fully?
+    \item How can the satellite handle the optimal pointing scheme (maximize sun radiation) while rotating the satellite to the position for firing?
+    \item How can a backup orbit/attitude determination scheme be chosen? What is the convergence time per method (approximate)?
+    \item What are the strengths and weaknesses of different methods of attitude/orbit determination?
+    \item \textit{Addition post reasearch:} Why are so many people still using EKFs for orbit determination? What kind of errors are they maintaining?
+    \item \textit{Addition post reasearch:} How are people handling the "tennis-racket" phenomemon (i.e., unbalanced rotation about an axis which does not run through the center of mass? Do these models take that into account?
+\end{enumerate}
+
+After I came up with these questions, I had Claude come up with keyword searches for me based on each one. ''
+
+\begin{framed}
+    \textbf{Prompt:} \vspace{5pt}
+
+    I am wanting to put together some keyword search queries for database engines, and I have the following questions to ask for a research project I'm doing. Can you please make some boolean search queries which take these questions into account? (\textit{pasted questions from above})
+
+\end{framed}
+
+The response was cleaned up and pasted as each of the search query expressions in the next subsection.
 
 \subsection{Search Log}
 % Header row: \tagpdfsetup{table/header-rows={1}} marks the first row as
@@ -27,12 +47,99 @@
   \midrule
   \endhead
   % Example row; replace it with your own searches.
-  2026-10-20 & Web of Science & \texttt{("spiking neural network" OR SNN) AND accelerator AND energy} & 312 & 14 \\
+    2026-11-1 & Web of Science & \texttt{(CubeSat OR SmallSat OR nanosatellite OR microsatellite OR "small satellite" OR spacecraft) AND ("power budget" OR "power management" OR "electrical power system" OR EPS OR "energy management" OR "power bus") AND (optimi* OR schedul* OR "duty cycl*" OR "load management") AND (probabilist* OR stochastic OR "Monte Carlo" OR "chance-constrained" OR uncertain* OR Markov) AND (communicat* OR radio OR transceiver OR ADCS OR "attitude control" OR propulsion OR thruster)} & 8 & 4 \\
+    2026-11-1 & Web of Science & \texttt{(CubeSat OR SmallSat OR nanosatellite OR microsatellite OR "small satellite" OR spacecraft) AND ("thermal energy storage" OR "thermal battery" OR "phase change material" OR "heat storage" OR "thermal capacitor") AND (water OR propellant OR steam) AND (heat* OR vapori* OR boil* OR "energy requirement" OR "heater power" OR "thermal model*")} & 53 & 2 \\  
+    2026-11-1 & Web of Science & \texttt{(CubeSat OR SmallSat OR nanosatellite OR microsatellite OR "small satellite" OR spacecraft) AND ("attitude guidance" OR "attitude planning" OR "attitude manoeuv*" OR "attitude maneuv*" OR slew* OR "pointing strateg*") AND ("sun pointing" OR "sun-pointing" OR "solar array" OR "power generation" OR "power-optimal" OR "energy-optimal") AND (thrust* OR burn OR firing OR "orbit maneuv*" OR "orbit manoeuv*" OR "delta-v" OR propulsion)} & 47 & 4 \\  
+    2026-11-1 & Web of Science & \texttt{(CubeSat OR SmallSat OR nanosatellite OR microsatellite OR "small satellite" OR spacecraft) AND ("attitude determination" OR "orbit determination" OR "attitude estimation" OR navigation) AND (backup OR redundan* OR "fault toleran*" OR "safe mode" OR "degraded mode" OR "fault detection" OR FDIR) AND (convergence OR "convergence time" OR "settling time" OR "initiali*" OR transient OR "time to converge")} & 60 & 15\\  
+    2026-11-1 & Web of Science & \texttt{(CubeSat OR SmallSat OR nanosatellite OR microsatellite OR "small satellite" OR spacecraft) AND ("attitude determination" OR "orbit determination" OR "attitude estimation") AND (comparison OR compar* OR review OR survey OR "trade study" OR "trade-off" OR performance) AND (TRIAD OR QUEST OR "q-method" OR "Kalman filter" OR EKF OR MEKF OR UKF OR "least squares" OR GNSS OR GPS OR TLE OR SGP4 OR magnetometer OR "sun sensor" OR "star tracker" OR gyro*)} & 842 & 4 \\  
+    2026-11-1 & Google Scholar & \texttt{(CubeSat OR SmallSat OR nanosatellite OR microsatellite OR "small satellite" OR spacecraft) AND ("attitude determination" OR "orbit determination" OR "orbit estimation" OR "attitude estimation" OR orbit OR attitude) AND (comparison OR compar* OR review OR survey OR "trade study" OR "trade-off" OR performance) AND (TRIAD OR QUEST OR batch OR sequential OR "q-method" OR "Kalman filter" OR EKF OR MEKF OR UKF OR unscented OR "least squares" OR "least-squares" OR PSO OR "particle-swarm" OR "optimization" OR "particle-swarm optimization") AND (GNSS OR GPS OR magnetometer OR "sun sensor" OR "star tracker" OR gyro* OR magnet*) NOT (control)} & 354000 &  0 (all same as WoS)\\   
+    2026-11-6 & Research Rabbit & Followed citation on Moriai, 2024 via search tool & 10 & 1 \\  
+    2026-11-6 & Claude Opus 4.5 & \texttt{I have a set of questions in @sections/literature\_search.tex which I'd like researched. I've recently installed a research MCP server that I would like you to utilize to search for papers and research that answer those core questions within "Search Questions and Queries". You should be able to see what  papers I already have; please attempt to find papers that are outside what I currently have} & 57 &  10\\  
   \bottomrule
 \end{longtable}
 
 \subsection{Collection}
 \textit{[F4: list of the collection with tags.]}
+% BEGIN ZOTERO
+% 36 items, generated by scripts/zotero_to_tex.py
+\begin{longtable}{@{}p{0.14\linewidth}p{0.14\linewidth}rp{0.45\linewidth}l@{}}
+  \toprule
+  Folder & Authors & Year & Title & Tag \\
+  \midrule
+  \endhead
+    Bus power & Pastena, Grassi & 1999 & Design and performance analysis of the electric power sub-system for a multi-mission microsatellite & Aux \\
+    Bus power & Pang et al. & 2015 & Nano-satellite swarm for SAR applications: design and robust scheduling & Core \\
+    Bus power & Doff-Sotta, Cannon, Forbes & 2022 & Spacecraft energy management using convex optimisation & Aux \\
+    Bus power & Hussein, Massoud, Khattab & 2023 & Optimized Load-Scheduling Algorithm for CubeSat's Electric Power System Management Considering Communication Link & Aux \\
+    Bus power & Park et al. & 2026 & Joint Sustainable Control and Quantum Reinforcement Learning for Energy-Efficient Cube-Satellite Networks & Aux \\
+    Bus power & Akarne et al. & 2026 & Self-Adaptive Energy-Aware Power Management for CubeSat Electrical Power Systems Under Dynamic Orbital Conditions & Aux \\
+    Thermal Analysis & Gilpin & 2015 & HIGH TEMPERATURE LATENT HEAT THERMAL ENERGY STORAGE TO AUGMENT SOLAR THERMAL PROPULSION FOR MICROSATELLITES & Aux \\
+    Thermal Analysis & Turner, Howie, Bland & 2024 & The Development of a Next-Generation Latticed Resistojet Thruster for CubeSats & Core \\
+    Thermal Analysis & Moriai et al. & 2025 & A water resistojet propulsion system on a 6U CubeSat EQUULEUS: Demonstration of reaction control in deep space & Aux \\
+    Pointing Optimization & Zhang et al. & 2020 & Finite-time attitude set-point tracking for thrust-vectoring spacecraft rendezvous & Core \\
+    Pointing Optimization & Kristiansen, Gravdahl, Johansen & 2021 & Energy optimal attitude control for a solar-powered spacecraft & Core \\
+    Pointing Optimization & Rigo et al. & 2021 & Task scheduling for optimal power management and quality-of-service assurance in CubeSats & Aux \\
+    Pointing Optimization & Scharnagl et al. & 2022 & NetSat—Challenges and lessons learned of a formation of 4 nano-satellites & Aux \\
+    Pointing Optimization & Kristiansen et al. & 2024 & Energy Optimal Attitude Control and Task Execution for a Solar-Powered Spacecraft & Core \\
+    Pointing Optimization & Calaon, Allard, Schaub & 2025 & Attitude reference generation for spacecraft with rotating solar arrays and pointing constraints & Aux \\
+    Orbit-Attitude Estimation & Humphreys & 2002 & Attitude Determination for Small Satellites with Modest Pointing Constraints & Aux \\
+    Orbit-Attitude Estimation & Jianqi, Xibin, Zhaowei & 2003 & Attitude and orbit determination for small satellite using magnetometer measurement & Aux \\
+    Orbit-Attitude Estimation & Psiaki & 2004 & Global Magnetometer-Based Spacecraft Attitude and Rate Estimation & Core \\
+    Orbit-Attitude Estimation & Pardal, Kuga, Vilhena De Moraes & 2011 & Robustness assessment between sigma point and extended Kalman filter for orbit determination & Aux \\
+    Orbit-Attitude Estimation & Habib & 2013 & A comparative study of spacecraft attitude determination and estimation algorithms (a cost–benefit approach) & Core \\
+    Orbit-Attitude Estimation & Le, Matunaga & 2013 & Real-Time Tuning Unscented Kalman Filter for a Redundant Attitude Estimator in Microsatellites & Aux \\
+    Orbit-Attitude Estimation & Zhou et al. & 2016 & A scheme of satellite multi-sensor fault-tolerant attitude estimation & Aux \\
+    Orbit-Attitude Estimation & Hajiyev, Cilden, Somov & 2016 & Gyro-free attitude and rate estimation for a small satellite using SVD and EKF & Aux \\
+    Orbit-Attitude Estimation & Cao, Li & 2016 & Unscented predictive variable structure filter for satellite attitude estimation with model errors when using low precision sensors & Aux \\
+    Orbit-Attitude Estimation & Soken & 2018 & A survey of calibration algorithms for small satellite magnetometers & Aux \\
+    Orbit-Attitude Estimation & Gaber, El Mashade, Aziz & 2020 & A Hardware Implementation of Flexible Attitude Determination and Control System for Two-Axis-Stabilized CubeSat & Aux \\
+    Orbit-Attitude Estimation & Quinsac et al. & 2020 & Attitude control: A key factor during the design of low-thrust propulsion for CubeSats & Aux \\
+    Orbit-Attitude Estimation & Takátsy et al. & 2022 & Attitude determination for nano-satellites – II. Dead reckoning with a multiplicative extended Kalman filter & Aux \\
+    Orbit-Attitude Estimation & Lin et al. & 2022 & Gyro-stellar inertial attitude estimation for satellite with high motion rate & Aux \\
+    Orbit-Attitude Estimation & Yousefi et al. & 2023 & A New Optimization-Based Attitude Estimator with a Closed form Solution Using Magnetometer and Gyro Data & Core \\
+    Orbit-Attitude Estimation & Kinatas, Hajiyev & 2023 & TRIAD-Aided Multiplicative EKF for Small Satellite Attitude Estimation and Magnetometer Calibration & Aux \\
+    Orbit-Attitude Estimation & Allahvirdi-Zadeh, El-Mowafy & 2024 & Array-Aided Precise Orbit and Attitude Determination of CubeSats using GNSS & Aux \\
+    Orbit-Attitude Estimation & Orozco, Giraldo & 2024 & Attitude Determination and Control in Small Satellites: A Review & Core \\
+    Orbit-Attitude Estimation & Chidambaram, Hilbert, Silva & 2025 & Fault-Tolerant Spacecraft Attitude Determination using State Estimation Techniques & Core \\
+    Orbit-Attitude Estimation & Jamshidi et al. & 2026 & Information fusion-based scheme to estimate model perturbations in spacecraft dynamics & Aux \\
+    Orbit-Attitude Estimation & Hajiyev, Cilden-Guler & 2026 & Nanosatellite attitude estimation, in-orbit sensor calibration and fault detection using kinematic relations only & Core \\
+  \bottomrule
+\end{longtable}
+% END ZOTERO
 
 \subsection{AI Search Compared With Databases}
-\textit{[F4: one paragraph.]}
+I didn't end up having enough time to retreive every paper that the AI searched, as it ended up coming back with a list of 57 papers given the prompt above, specifically asking to exclude the papers I already had in the collection. I have tried this exercise in the past, and one of the things I did differently this time was to setup a model context protocol (MCP) which allows papers to be searched via the internet. Now, whenever I ask for literature review things, the AI will query up to real databases based on my search tool (called \href{https://github.com/openags/paper-search-mcp}{Paper Search MCP}). I think one of the things it's bad at it coming up with conclusions from the output of the papers. For example, I might read something new in a paper, then go look for other papers with that subject. Since AI doesn't have access to the PDF most of the time, it's just looking at the abstract for results. Sometimes, careful study of the paper is important to understand where the next search direction is or what questions you should ask. That being said, as far as I can tell every DOI I searched again was real, but I didn't check all 57 papers. It was much better at searching for what I was asking rather than keywords, as it found several papers that I can tell are very useful like Morai et. al.(2025) that definitely wouldn't have been caught by a keyword search.
+
+%    Bus power & Pastena, Grassi & 1999 & Design and performance analysis of the electric power sub-system for a multi-mission microsatellite & Aux \\
+%    Bus power & Pang et al. & 2015 & Nano-satellite swarm for SAR applications: design and robust scheduling & Core \\
+%    Bus power & Park et al. & 2026 & Joint Sustainable Control and Quantum Reinforcement Learning for Energy-Efficient Cube-Satellite Networks & Aux \\
+%    Bus power & Akarne et al. & 2026 & Self-Adaptive Energy-Aware Power Management for CubeSat Electrical Power Systems Under Dynamic Orbital Conditions & Aux \\
+%    Thermal Analysis & Gilpin & 2015 & HIGH TEMPERATURE LATENT HEAT THERMAL ENERGY STORAGE TO AUGMENT SOLAR THERMAL PROPULSION FOR MICROSATELLITES & Aux \\
+%    Thermal Analysis & Turner, Howie, Bland & 2024 & The Development of a Next-Generation Latticed Resistojet Thruster for CubeSats & Core \\
+%    Pointing Optimization & Zhang et al. & 2020 & Finite-time attitude set-point tracking for thrust-vectoring spacecraft rendezvous & Core \\
+%    Pointing Optimization & Kristiansen, Gravdahl, Johansen & 2021 & Energy optimal attitude control for a solar-powered spacecraft & Core \\
+%    Pointing Optimization & Rigo et al. & 2021 & Task scheduling for optimal power management and quality-of-service assurance in CubeSats & Aux \\
+%    Pointing Optimization & Scharnagl et al. & 2022 & NetSat—Challenges and lessons learned of a formation of 4 nano-satellites & Aux \\
+%    Pointing Optimization & Kristiansen et al. & 2024 & Energy Optimal Attitude Control and Task Execution for a Solar-Powered Spacecraft & Core \\
+%    Pointing Optimization & Calaon, Allard, Schaub & 2025 & Attitude reference generation for spacecraft with rotating solar arrays and pointing constraints & Aux \\
+%    Orbit-Attitude Estimation & Humphreys & 2002 & Attitude Determination for Small Satellites with Modest Pointing Constraints & Aux \\
+%    Orbit-Attitude Estimation & Jianqi, Xibin, Zhaowei & 2003 & Attitude and orbit determination for small satellite using magnetometer measurement & Aux \\
+%    Orbit-Attitude Estimation & Psiaki & 2004 & Global Magnetometer-Based Spacecraft Attitude and Rate Estimation & Core \\
+%    Orbit-Attitude Estimation & Habib & 2013 & A comparative study of spacecraft attitude determination and estimation algorithms (a cost–benefit approach) & Core \\
+%    Orbit-Attitude Estimation & Le, Matunaga & 2013 & Real-Time Tuning Unscented Kalman Filter for a Redundant Attitude Estimator in Microsatellites & Aux \\
+%    Orbit-Attitude Estimation & Zhou et al. & 2016 & A scheme of satellite multi-sensor fault-tolerant attitude estimation & Aux \\
+%    Orbit-Attitude Estimation & Hajiyev, Cilden, Somov & 2016 & Gyro-free attitude and rate estimation for a small satellite using SVD and EKF & Aux \\
+%    Orbit-Attitude Estimation & Cao, Li & 2016 & Unscented predictive variable structure filter for satellite attitude estimation with model errors when using low precision sensors & Aux \\
+%    Orbit-Attitude Estimation & Soken & 2018 & A survey of calibration algorithms for small satellite magnetometers & Aux \\
+%    Orbit-Attitude Estimation & Gaber, El Mashade, Aziz & 2020 & A Hardware Implementation of Flexible Attitude Determination and Control System for Two-Axis-Stabilized CubeSat & Aux \\
+%    Orbit-Attitude Estimation & Quinsac et al. & 2020 & Attitude control: A key factor during the design of low-thrust propulsion for CubeSats & Aux \\
+%    Orbit-Attitude Estimation & Takátsy et al. & 2022 & Attitude determination for nano-satellites – II. Dead reckoning with a multiplicative extended Kalman filter & Aux \\
+%    Orbit-Attitude Estimation & Lin et al. & 2022 & Gyro-stellar inertial attitude estimation for satellite with high motion rate & Aux \\
+%    Orbit-Attitude Estimation & Yousefi et al. & 2023 & A New Optimization-Based Attitude Estimator with a Closed form Solution Using Magnetometer and Gyro Data & Core \\
+%    Orbit-Attitude Estimation & Kinatas, Hajiyev & 2023 & TRIAD-Aided Multiplicative EKF for Small Satellite Attitude Estimation and Magnetometer Calibration & Aux \\
+%    Orbit-Attitude Estimation & Allahvirdi-Zadeh, El-Mowafy & 2024 & Array-Aided Precise Orbit and Attitude Determination of CubeSats using GNSS & Aux \\
+%    Orbit-Attitude Estimation & Orozco, Giraldo & 2024 & Attitude Determination and Control in Small Satellites: A Review & Core \\
+%    Orbit-Attitude Estimation & Chidambaram, Hilbert, Silva & 2025 & Fault-Tolerant Spacecraft Attitude Determination using State Estimation Techniques & Core \\
+%    Orbit-Attitude Estimation & Jamshidi et al. & 2026 & Information fusion-based scheme to estimate model perturbations in spacecraft dynamics & Aux \\
+%    Orbit-Attitude Estimation & Hajiyev, Cilden-Guler & 2026 & Nanosatellite attitude estimation, in-orbit sensor calibration and fault detection using kinematic relations only & Core \\
+%  \bottomrule
