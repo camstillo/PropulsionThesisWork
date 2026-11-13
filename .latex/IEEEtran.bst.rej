@@ -1,0 +1,104 @@
+--- IEEEtran.bst    2025-09-12 14:07:19
++++ IEEEtranDOI.bst 2025-09-15 08:32:16
+@@ -264,6 +264,7 @@
+     dayfiled
+     edition
+     editor
++    doi
+     howpublished
+     institution
+     intype
+@@ -1902,25 +1903,79 @@
+ }
+ 
+ 
++%% FIND AND REPLACE
++INTEGERS{ l }
++FUNCTION{ string.length }
++{
++    #1 'l :=
++    {duplicate$ duplicate$ #1 l substring$ = not}
++        {l #1 + 'l :=}
++    while$
++    pop$ l
++}
++STRINGS{replace find text}
++INTEGERS{find_length}
++FUNCTION{find.replace}
++{ 'replace :=
++    'find :=
++    'text :=
++    find string.length 'find_length :=
++    ""
++        { text empty$ not }
++        { text #1 find_length substring$ find =
++            {
++                replace *
++                text #1 find_length + global.max$ substring$ 'text :=
++            }
++            {   text #1 #1 substring$ *
++                text #2 global.max$ substring$ 'text :=
++            }
++            if$
++        }
++    while$
++}
+ 
++
+ %% URL
+ 
+ FUNCTION {format.url}
+ { is.use.url
+-    { url empty$
+-      { "" }
+-      { this.to.prev.status
+-        this.status.std
+-        cap.yes 'status.cap :=
+-        name.url.prefix " " *
+-        "\url{" * url * "}" *
+-        punct.no 'this.status.punct :=
+-        punct.period 'prev.status.punct :=
+-        space.normal 'this.status.space :=
+-        space.normal 'prev.status.space :=
+-        quote.no 'this.status.quote :=
+-      }
+-    if$
++    { doi empty$
++        { url empty$
++            { "" }
++            { this.to.prev.status
++              this.status.std
++              cap.yes 'status.cap :=
++              name.url.prefix " " *
++              "\url{" * url * "}" *
++              punct.no 'this.status.punct :=
++              punct.period 'prev.status.punct :=
++              space.normal 'this.status.space :=
++              space.normal 'prev.status.space :=
++              quote.no 'this.status.quote :=
++            }
++          if$
++        }
++        { this.to.prev.status
++          this.status.std
++          cap.yes 'status.cap :=
++          
++          % Use these three lines to be consistent with the IEEE Reference Guide
++          "doi: \href{https://doi.org/" doi * "}{" * doi "_" "\_" find.replace * "}" *
++          punct.period 'this.status.punct :=
++          punct.comma 'prev.status.punct :=
++          
++          % Use these four lines to have DOIs appear as URLs
++          %name.url.prefix " " *
++          %"\url{https://doi.org/" * doi * "}" *
++          %punct.no 'this.status.punct :=
++          %punct.period 'prev.status.punct :=
++          
++          space.normal 'this.status.space :=
++          space.normal 'prev.status.space :=
++          quote.no 'this.status.quote :=
++        }
++      if$
+     }
+     { "" }
+   if$
