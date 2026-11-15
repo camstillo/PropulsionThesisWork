@@ -1,0 +1,430 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{cite}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{framed}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+
+\begin{document}
+
+
+\section{Finite-time attitude set-point tracking for thrust-vectoring spacecraft rendezvous}
+\subsection{Notes}
+\begin{itemize}[noitemsep]
+    \item talking about rendezvous and docking for spacecraft; not exactly the same situation, but similar premise
+    \item Spacecrafe $\rightarrow$ has single thrust vector location
+    \item Single impulse thurster + reaction wheel control
+    \item optimize for pointing and attitude set-point tracking m
+    \item lambert method?
+    \item numerical shooting, transcription methods, and heuristic methods $\rightarrow$ what are these?
+    \item ant-colony optimization and Particle swarm optimization $\rightarrow$ what are these?
+    \item SO3 $\rightarrow$ what is this? why is it difficult to construct a control scheme on it?
+    \item There might be problems with using quaternions for attitude representations [23-25]
+    \item Finite time attitude control: what's this? 
+    \item co-ordinate-free fast terminal sliding mode controller $\rightarrow$ doesn't require a computation of the second-order derivative
+    \item $R \in \,\text{SO(3)}\,$  rotation matrix from ECI to the spacecraft
+    \item $\text{SO(3)} = \left\{\mathbb{R} \in \mathcal{R}^{3\times 3}: \mathbb{R}^T\mathbb{R} = \mathbb{I}_{3 \times 3}, \,\text{det}(\mathbb{R}) = 1\right\}$
+    \item Lie group $\rightarrow$ What's this?
+    \item Skew symmetric matrix $(\Omega)^{\times}$ of $\mathbb{\Omega}$
+    \item Makes assumption that rendezvous for chaser can be made in N impulses
+    \item attitude error matrix on SO(3) is calculated via a trace: $\Psi(\mathbb{R}_i, \mathbb{R}_{di}) = \frac{1}{2}\,\text{tr}\left[\mathbb{K}(\mathbb{I}_3 - \mathbb{R}_{di}^T\mathbb{R}_i)\right]$
+    \item See ref 33 for more info on what's going on in 2.1.2
+    \item Lagrange formulation of lambert problem $\rightarrow$ What is this?
+    \item What does all this lambert stuff mean?
+    \item Cost function: just minimizing $\,\text{min}\, J = \sum_{i=1}^{N}\Delta v_i$ (in this paper, assume $N=1$)
+    \item Look up more in terms of PSO
+    \item Multiplier method to incorperate constraints (see [40]) what does this mean?
+    \item I totally don't understand the PSO algorithm that they pose. I don't see how they are adding the constraints back into the problem.
+    \item So PSO doesn't guarantee a global minimum, just one that's a minimum (if at all) and you wouldn't know if that minimum was truly a minimum. Maybe I'm not understanding something here.
+    \item Disturbances assumed to be negligible, but there are technologies which handle the disturbances by moving a mass internally.
+    \item They assume that $\Delta v$ is applied all at once in an impulse, but real propulsion systems will take some firing time. This may need to be accounted for.
+    \item steps: apply orbit control via PSO to find optimal impulses and times (how much $\Delta v$ and at what time) then find the attitude controller they derive in this paper
+    \item PSO derives different performances over different problems. IPSO, CPSO, and lambert give different answers (with IPSO coming out the best)
+    \item I don't feel that their qualification that their improved PSO is better is actually worth much since they didn't really qualify that over multiple orbits. I guess I need to know more about PSOs.
+\end{itemize}
+
+\subsection{My Summary}
+
+This work claims that a spacecraft rendezvous system can be created which uses a heuristic optimization method (Particle swarm optimization) which allows a separate pointing solution to be solved in closed form. The simulated spacecraft is a single-thruster satellite which is attempting to meet with a target satellite in a non-concentric orbit. Given the initial position of the first satellite, what's the best time and $\Delta v$ requirements for a series of burns to get to meet with the satellite. This is solved for with an improved particle swarm optimization, a type of heuristic optimization where a local minima is found. The authors improve on this algorithm with a custom implementation that reduces $\Delta v$ requirements. In addition, this paper shows that once the burn timing and $\Delta v$ are solved for, the pointing solution can be solved in closed form using the method of multipliers. They solve this with a lyapunov function. 
+
+This optimization method is demonstrated in a four-burn orbital transfer which successfully meets with a target spacecraft. Their PSO method is only marginally better than the existing PSO, and might not be worth using in many cases. Their work also gives a framework, but only tests it over a single orbital maneuver; it does not show the effects of not meeting their assumptions or over different orbital conditions. Cubesat propulsion might have a difficult time with this method as their thrusters are much less powerful, which adds additional constraints that may make PSO fail. They don't compare against a baseline method other than their improved PSO and the standard PSO algorithms, as other methods for orbital transfers might struggle to meet these goals. Their measurement is based only on how much $\Delta v$ was used (i.e., fuel consumed for the maneuver).
+
+As far as supporting work, code and data are not available, but the paper does include their solution parameters to remake their existing code. If I were to use this in my own work, the pointing solution would need to be updated to account for the maximum-power path as well as the pointing solution. For a near-circular orbit, the timing and $\Delta v$ would already be determined beforehand asmy work doesn't include a dimension to track a target spacecraft. Adding the dimension of the spacecraft power generation may move that solution out of its closed form, since speed isn't the only thing we need.
+
+\subsection{AI Summary}
+
+\textit{Full-text summary from the PDF in \textasciitilde/Library/Papers (found via file search). Reference: J. Zhang, J.D. Biggs, D. Ye, Z. Sun, ``Finite-time attitude set-point tracking for thrust-vectoring spacecraft rendezvous,'' Aerospace Science and Technology, vol.\ 96, 105588, 2020. Note: there is a fourth author (Dong Ye) beyond the three in the filename.}
+
+\textbf{Problem:}
+\begin{itemize}[noitemsep]
+    \item Chaser must match the target's position and velocity at a fixed final time $t_f$ while minimizing total $\Delta v = \sum_{i=1}^{N} \|\Delta \mathbf{v}_i\|$.
+    \item Target and chaser start on general (non-coplanar, non-circular) orbits.
+    \item Chaser has a single impulsive thruster fixed along body axis $z_b$ plus reaction wheels: the only way to aim thrust is to rotate the whole spacecraft. Translation and rotation are therefore coupled, and the paper models full 6-DOF dynamics (their Eq.\ 1).
+\end{itemize}
+
+\textbf{Part 1: trajectory generation via improved PSO (Sec.\ 3):}
+\begin{itemize}[noitemsep]
+    \item Fixes $N = 4$ impulses, citing Prussing (1969): four impulses suffice for optimal fixed-time rendezvous.
+    \item PSO optimizes 8 variables covering the first two impulses: $\|\Delta \mathbf{v}_i\|$, direction angles $\alpha_i, \beta_i$, and eccentric-anomaly coast $\Delta E_i$; Kepler's equation (their Eq.\ 5) converts $\Delta E_i$ into a coast time.
+    \item The last two impulses are solved in closed form from Lagrange's formulation of Lambert's problem (single-revolution only, $n=0$), which guarantees the terminal boundary conditions (position and velocity match at $t_f$).
+    \item Improvements over conventional PSO (this answers my margin question about how constraints get back in): constraints handled with the multiplier method (augmented Lagrangian penalty, Rockafellar 1973, ref [40]); information from infeasible particles is retained and used for updates; linearly decreasing inertia weight $\omega: 0.9 \rightarrow 0.4$; time-varying learning factors ($c_1$ decreases, $c_2$ increases); out-of-bounds particles/velocities are re-sampled.
+    \item On my question ``is PSO's minimum really a minimum?'': correct, PSO is a heuristic with no global-optimality guarantee; the paper only argues IPSO beat CPSO and Lambert on this one test case.
+\end{itemize}
+
+\textbf{Part 2: finite-time attitude controller (Secs.\ 2.1.2, 4):}
+\begin{itemize}[noitemsep]
+    \item Reference attitude defined on SO(3): desired $z_b$ axis $= \Delta \mathbf{v}_i / \|\Delta \mathbf{v}_i\|$ (unit vector along the burn); a transverse vector $\mathbf{s}_d$ (transverse to $z_b$) fixes the roll angle about the thrust axis. \textbf{The paper notes $\mathbf{s}_d$ could be chosen as the velocity vector or the Sun direction} --- they pick it arbitrarily since no mission requirement exists. So the roll about the thrust axis is a free degree of freedom that could be used for sun-pointing/solar power (directly relevant to my Q3).
+    \item Attitude error: modified trace function $\Psi_i(\mathbf{R}_i, \mathbf{R}_{di}) = \frac{1}{2}\mathrm{tr}[\mathbf{K}(\mathbb{I}_3 - \mathbf{R}_{di}^T \mathbf{R}_i)]$ on SO(3). This avoids MRP singularities and the quaternion \textit{unwinding} problem (two quaternions map to one physical rotation; one is stable, one unstable, so a controller can wind the long way around).
+    \item Controller: coordinate-free \textbf{fast terminal sliding mode controller} (FTSMC) with sliding surface
+    $S = e_{\Omega} + \vartheta_1 e_R + \vartheta_2\, \mathrm{sig}^{\varphi}(e_R)$, $0 < \varphi < 1$, where $\mathrm{sig}^{\varphi}(e_R)$ is the componentwise $|e_{R,j}|^{\varphi}\mathrm{sgn}(e_{R,j})$.
+    \item Stability: Lyapunov $V = \Psi_i + \frac{K_3}{2} S^T J S$, shown to satisfy $\dot{V} \le -K_a V - K_b V^{(1+\varphi)/2}$, which gives finite-time convergence (Lemma 2) within an estimated region of attraction --- \textbf{local, not global}.
+    \item Claimed novelty: unlike earlier finite-time SO(3) controllers, no second derivative of the error function is needed, so it is cheaper to compute.
+    \item Torque saturated at $u^{\max}$ (reaction wheels, fully actuated).
+\end{itemize}
+
+\textbf{Simulation (Sec.\ 5):}
+\begin{itemize}[noitemsep]
+    \item Orbits: target $a = 27500$ km, $e = 0.12$, $i = 50^\circ$; chaser $a = 7800$ km, $e = 0.2$, $i = 45^\circ$ (non-coplanar).
+    \item Chaser: $m = 400$ kg, $J = \mathrm{diag}(400,400,400)$ kg$\cdot$m$^2$ (symmetric $\Rightarrow$ gyroscopic term $-\Omega \times J\Omega$ vanishes!), $u^{\max} = 4$ N$\cdot$m.
+    \item $t_f = 10000$ s; 200 s allotted to reorient before each burn.
+    \item PSO: 40 particles, 1000 iterations, $\Delta v_i \le 2$ km/s search bound.
+    \item Total $\Delta v$: Lambert-only 8.6504 km/s; conventional PSO 6.6825 km/s; improved PSO 6.4326 km/s.
+    \item Attitude settling time $\approx 50$ s within torque limits; attitude error $\sim 10^{-8}$, rate error $\sim 10^{-5}$ deg/s at each burn.
+    \item Trajectory tracking errors (Table 5): at most 0.42 m and $3.2\times10^{-4}$ m/s.
+\end{itemize}
+
+\textbf{Things to watch when citing:}
+\begin{itemize}[noitemsep]
+    \item \textbf{Their solution actually uses three burns, not four}: in the IPSO solution, impulses 1 and 2 both fire at $t=0$ (Table 2), and the text says three impulses suffice --- yet the abstract/conclusions still say ``4 impulsive maneuvers.''
+    \item \textbf{Internal inconsistency on position error}: conclusions claim ``$< 0.2$ m,'' but Table 5 shows 0.42 m at the third burn ($t = 1893.9$ s); only the final error (0.17 m) is under 0.2 m.
+    \item Correction to my note above: the cost function assumes $N = 4$, not $N = 1$.
+    \item \textbf{Test case is far from my application}: impulsive burns (instantaneous $\Delta v$), disturbances neglected (they suggest an extended state observer or moving-mass control), symmetric inertia. With $\Delta v \approx 6.4$ km/s and a resistojet-class $I_{sp} \approx 150$ s ($v_e \approx 1.5$ km/s), the rocket equation gives mass ratio $m_0/m_f = e^{\Delta v/v_e} \approx 75$ --- impossible for a CubeSat, and at mN thrust each ``impulse'' would take days. Reuse the method, not the numbers.
+\end{itemize}
+
+\section{Self-Adaptive Energy-Aware Power Management for CubeSat Electrical Power Systems Under Dynamic Orbital Conditions} 
+
+\subsection{Notes}
+
+\begin{itemize}[noitemsep]
+    \item Load shedding $\rightarrow$ What's that?
+    \item Conventional EPS: rule-based logic and static power budgets
+    \item MPC: optimize control actions over finite prediction horizon
+    \item MPC might not maintain optimality for all situations, as it is controled by design hyperparameters like prediction horizon and objective weighting coefficients $\rightarrow$ weigghting coefs = coefs for optimization.
+    \item Sparrow Search Algorihtm = SSA (what is this?)
+    \item See 11 and 7 for mission scheduling and stuff. 
+    \item Most cubesat power optimization approaches don't account for adaptive changes in the orbit or mission conditions as well as time-varying powerr allocation
+    \item Battery aging $\rightarrow$ arrhenius exponential terms and thermal raditation introduces $T^4$ non-linearities
+    \item adaptive supervisory layer to handle mission-dependent conditions and changing orbital conditions (energy management system) $\rightarrow$ adjust MPC parameters online in response to changing orbital conditions, load variations, and mission priorities.
+    \item SSA operates with bounded computational complexity which is feasible on board
+    \item Perform global power allocation considering time-varying energy demand, orbital conditions, system constraints within a single optimization problem.
+    \item energy storage: could be extended to include energy stored in a thermal battery
+    \item load schedule into a predictive optimization framework to plan activation decisions while enforcing SoC and thermal constraints
+    \item Probabilistic model of power reception: makes the assumption that power is scheduled, but in the case of an AMSAT satellite, packet reception is random and therefore power cannot be "scheduled" in the same way. 
+    \item Limited by thermal dynamics within the satellite for battery degredation and such
+    \item orbital and eclipse models directly support how much photovoltaic ability there is in terms of eclipse intervals
+    \item also includes model for uncontrolled attitude (i.e., u=tumbling satellite like a 1U)
+    \item Includes SOH degredation model for LiIon battery (includes battery temp)
+    \item Does their SOH take into account temperature when heated? Many satellites include some kind of battery heater -- section III.C. talks about battery heat due to discharge and radiative dissipation, but not the battery heater
+    \item See [29] for full model of battery SOH
+    \item They do also include temperature evolution in time with battery and external radition 
+    \item \textbf{Energy Management Framework}
+    \begin{itemize}[noitemsep]
+        \item \textit{Montitoring layer} sensory interface with aggregation of onboard telemetry measurements and internal satellite measurements and battery thermal states
+        \item \textit{Prediction Layer} orbital dynamics and thermal estimators to forecast power availability and component behavior over the control horizon
+        \item \textit{Decision Layer} computational core where SSA-tuned MPC algorithm resolved the optimization problem.
+        \item \textit{Actuation Layer} Translates these optimal commands and precise power allocation directives into hardware components.
+    \end{itemize}
+    \item Includes nothing about attitude control: power management could also be influences by power needed to point.
+    \item Assuming constraint $P_{PV} + P_b = P_{\text{Load}} + P_{\text{Res}}$ 
+    \item Must maintain that that the battery has some residual $P_{\,\text{Res}\,}$ must be never violated
+    \item Also assumes that battery SOC cannot drop below 0.6: $0.6 \leq SOC \leq 0.9$
+    \item Ensure that critical systems get the load? they have a constraint for that with a binary "scheduling" variable. How does the MPC reduce this? I see that it's a constraint but not a control variable
+    \item How to handle the metaparameter tuning online? --- this section isn't well-cited. I wish they would have cited it better because knowing all of this information would have been useful
+    \begin{itemize}[noitemsep]
+        \item Simulated annealing (?? don't know what this is) $\rightarrow$ can escape local minima, but doesn't converge quickly and depends strongly on a cooling schedule (what does that mean?)
+        \item PSO $\rightarrow$ efficient population-based noise schedules but there is a tendency towards premature convergence
+        \item Genetic Algorithms $\rightarrow$ strong global exploration and potentially incompatible with limited resources on cubesat
+        \item Sparrow search $\rightarrow$ they don't say much about what this is, but there is a "tradeoff between exploration and exploitation" via "adaptive producer-scrounger mechanism" allowing robustness to dynamic variation.
+    \end{itemize}
+    \item SSA $\rightarrow$ address rugged, non-convex optimization that can handle multiple local minima welll
+    \item SSA $\rightarrow$ feasible computation time for cubesat onboard computers
+    \item Assumes that SOC is well understood (am I right about this?) whereas the real system will have some error in it.
+    \item tune prediction horizon and coefficients for weighting the satellite (see [6] for info on how SSA works)
+    \item cost function is a weighted sum of penalties on $\Delta$state of health, residual power, and deviation of internal temperature. 
+    \item SSA fitess $\rightarrow$ maximize a reward signal, $\,\text{Fitness}\, = 1 / (1 + \,\text{Cost}\,)$
+    \item Don't quite understand how the plots in fig. 4 work $\rightarrow$ green line looks like battery discharge power? But in non-eclipse, shouldn't battery power go negative? 
+    \item battery temperature reduced by $2^{\circ}$C over a single orbit
+    \item They talk about how this adapts for multiple changing orbit conditions, then don't show a changing orbital condition. Doesn't take into account orbital parameters at all, just eclipse times which they take as static
+    \item For fig. 10: 12000 orbits at 90 min/orbit $\approx$ 2 years in space (SSA-MPC has 4\% increase over baseline)
+    \item Monte carlo analysis: MPC improves by reducing uncertainty and mean of important parameters (raises SOC pretty drastically when possible)
+    \item Almost 10\% increase in load availability, eliminating service interruptions and uncertain orbital conditions (although orbital conditions never change here)
+\end{itemize}
+
+\subsection{My Summary} 
+
+This work provides a framework for improving model-predictive control algorithms for spacecraft power management. Model-predictive control utilizes a time horizon and cost weight parameters to determine what features get most optimized for over time. This work's innovation is to handle adaptively tuning this MCP optimization strategy with a sparrow-search algorithm (SSA) that automatically tunes the MPC parameters to take into account the power generation, load needs, and future orbital states. The SSA-MPC algorithm is compared with a fixed-parameter MPC as a baseline over a single orbit.
+
+The SSA-MPC also takes into account external spacecraft parameters like termperatures and eclipse times. Using a model of battery state of health (SOH) degredation over time, the battery is shown to have dropped 4\% less in SOH over a fixed-parameter MCP. It also shows that the margin of residual power leftover during the eclipse period can be much greater in different orbital conditions. Overall, their claim that their method is more energy-efficient than existing methods is certainly shown.
+
+They don't take into account orbital variation well and don't consider loads with probabilistic models of load consumption. For example, a communication payload does not have the ability to be scheduled like other loads. Packets arrive randomly and must be processed and responded to, which is a significant load on the satellite. The power this operation consumes is therefore based on the probability of packets arriving in the first place. In addition, they do a monte-carlo analysis over variations in an orbit, but don't consider a change in orbit like a thruster would take. What happens if orbital parameters change completely? This seems like a good way to handle that, but they don't show it. 
+
+This relates exactly to my work as the satellite with the propulsion system on it adds a thermal battery for energy storage which has its own heath degredation over time. To prepare for a firing, the load would have to adapt to the additional thruster payload, which is how we might be able to keep the satellite running even with the extra payload of the thruster.
+
+\subsection{AI Summary:}
+
+\textit{Full-text summary from the PDF in \textasciitilde/Library/Papers/Thesis/Power. Reference: B. Hussein, A.M. Massoud, T. Khattab, ``Optimized Load-Scheduling Algorithm for CubeSat's Electric Power System Management Considering Communication Link,'' IEEE Trans.\ Aerospace and Electronic Systems, vol.\ 59, no.\ 6, pp.\ 7455--7468, Dec.\ 2023, doi:10.1109/TAES.2023.3290547 (open access, CC BY 4.0). Note: this is a \textbf{different paper} from the SSA-MPC paper in my notes above.}
+
+\textbf{Problem:}
+\begin{itemize}[noitemsep]
+    \item Plan one day of CubeSat load schedules so that the downlink gets the best data rate $R$ and bit error rate (BER) it can, while keeping power and energy within the EPS limits.
+    \item Framing: the CubeSat is treated as an isolated dc nanogrid/microgrid, and load scheduling is \textit{demand-side management} borrowed from terrestrial microgrid work.
+    \item Claimed gap: earlier CubeSat scheduling handled either energy or the comm window, not both, and rarely explained \textit{how} loads were prioritized.
+\end{itemize}
+
+\textbf{Load classification (main contribution):}
+\begin{itemize}[noitemsep]
+    \item \textbf{TM} (time-modulated): fixed power, can be shifted in time.
+    \item \textbf{MM} (magnitude-modulated): fixed time, power level adjustable.
+    \item \textbf{TMM}: both shiftable and adjustable (supporting, non-urgent tasks).
+    \item \textbf{FL} (fixed load): fixed time and fixed power, e.g.\ the beacon.
+    \item ``Dynamic loading'': a load may change class during the mission.
+    \item Priority order: FL $>$ MM $>$ TM. TM/TMM tasks are \textit{preempted} (postponed), never rejected, so data is not lost.
+    \item Four mission classes from high/low data rate $\times$ high/low reliability, each mapped to a power/energy demand.
+\end{itemize}
+
+\textbf{Comm model:}
+\begin{itemize}[noitemsep]
+    \item Rate assumed to sit at Shannon capacity: $R = B\log_2(1+\mathrm{SNR})$, with $\mathrm{SNR} = P|h|^2/N$.
+    \item BPSK: $\mathrm{BER} = Q(\sqrt{2\gamma_b})$, with $\gamma_b = P|h|^2/(NR)$.
+    \item Key trade-off: at a fixed $P$, raising $R$ lowers the energy per bit, so BER gets worse. Fixing any one of rate, BER, or power sets the other two (feasible region, Fig.\ 4).
+    \item Channel: deterministic free-space path loss only, $|h|^2 = 1/\mathrm{FSPL}$, with $\mathrm{FSPL} = (4\pi d f/c)^2$ and slant range $d(\varepsilon)$ a function of elevation $\varepsilon$.
+    \item Elevation is taken as linear in time, $\varepsilon(t) = 2\pi t/T_{orb} + \pi/2$, with the satellite starting directly over the station.
+\end{itemize}
+
+\textbf{Optimization formulation:}
+\begin{itemize}[noitemsep]
+    \item Day = $F$ orbits $\times$ $T$ slots. Each load is described by $L_i = [a_i, b_i, d_i, p_i, y_i]$: allowed window, required duration, rated power, and class.
+    \item Decision variable: $u_i^{s,f}$, the status of load $i$ in slot $s$ of orbit $f$ (an $F\times T\times M$ array).
+    \item Relaxed from binary to $0 \le u_i^{s,f} \le 1$. \textbf{This relaxation is what creates magnitude modulation}: a fractional $u$ means partial power.
+    \item Cost: $c = \omega_1 (1/R) + \omega_2\,\mathrm{BER} + \omega_3 E_{cons}$. They set $\omega_3 = 0$ (communication mission), so energy enters only through the constraints.
+    \item Constraints: transmit $I$ bits in total; per-load power $\le$ max demand inside $[a_i,b_i]$ and zero outside it; $E_{cons}(t) \le E_{bt}(t) + E_{gen}(t)$; $\mathrm{BER} \le \mathrm{BER}_{max}$; $R_{min} \le R \le$ capacity.
+    \item $E_{gen} = \sum_{\text{6 faces}} S_0 \eta A \cos\gamma$, assuming the Sun incidence angle $\gamma$ is known from ADCS. $E_{bt} = C\,V_{bt}$, with battery voltage held in the linear SoC--V region (6--8 V) for battery health.
+    \item Solved with MATLAB Optimization Toolbox (problem-based). One open-loop schedule is computed at the start of each day. The paper does not name the solver; with continuous $u$ and nonlinear $f_1, f_2$ this is an NLP, so presumably a local solver such as \texttt{fmincon} (my inference).
+\end{itemize}
+
+\textbf{Test setup:}
+\begin{itemize}[noitemsep]
+    \item VHF downlink, $B = 20$ kHz, noise $-132.6$ dB.
+    \item $T_{orb} = 120$ min and $T_s = 2$ min, giving $F = 12$ orbits/day and $T = 60$ slots/orbit.
+    \item Loads: COM 4.4 W (TMM, window slots 60--300); EPS 0.4 W, OBC 0.75 W, and ADCS 1.4 W are FL all day; payload camera 1.45 W is FL in slots 1--10.
+    \item 10 W average generation, so the COM limit is $MD_{com} = 10 - \sum p_{FL} = 6$ W.
+    \item The available-energy profile (sunlit charge plus eclipse discharge) is given to the scheduler as an input; it is not modeled.
+\end{itemize}
+
+\textbf{Results:}
+\begin{itemize}[noitemsep]
+    \item \textbf{Base case} (no scheduling, full COM power, $I = 0.3$ Mb at 80 b/s): energy is spent transmitting even when the channel is too poor to deliver data.
+    \item \textbf{Scheduled}, $\omega_1=\omega_2=1$: $R = 144.6$ b/s and lowest BER $3.40\times10^{-17}$. COM turns off when the channel is poor; when $\mathrm{SNR}\to 0$, BER $\to 0.5$ (the receiver is just guessing).
+    \item For the weight study, the fixed-data constraint is relaxed to a range:
+    \begin{itemize}[noitemsep]
+        \item Case I ($\omega_1=0,\ \omega_2=1$): $R = 50.3$ b/s, BER$_{min} = 2.91\times10^{-19}$
+        \item Case II ($1,\ 0$): $R = 113.7$ b/s, BER$_{min} = 3.1\times10^{-7}$
+        \item Case III ($0.5,\ 0.5$): $R = 106.5$ b/s, BER$_{min} = 3.97\times10^{-7}$
+        \item Case IV ($0.3,\ 0.7$): $R = 85$ b/s, BER$_{min} = 1.03\times10^{-7}$
+        \item Case V ($0.7,\ 0.3$): $R = 109.7$ b/s, BER$_{min} = 1.42\times10^{-8}$
+    \end{itemize}
+    \item COM energy is below the base case in every scheduled case, and roughly the same across weightings; the weights mostly trade $R$ against BER.
+    \item Data rates are low because the feasible region bounded by $R_{min}$, $\mathrm{BER}_{max}$, and $P_{max}$ is narrow (Fig.\ 15). Relaxing $\mathrm{BER}_{max}$ raises $R$ (Table IV, which I could not extract from the PDF).
+    \item Suggested fix for higher rates: M-ary modulation (QPSK/MPSK).
+\end{itemize}
+
+\textbf{Things to watch when citing:}
+\begin{itemize}[noitemsep]
+    \item \textbf{Reported numbers contradict the text in places:}
+    \begin{itemize}[noitemsep]
+        \item The text says Case III's lower rate improved BER versus Case II, but its BER$_{min}$ is worse ($3.97\times10^{-7}$ vs $3.1\times10^{-7}$).
+        \item The text says Case V's higher rate made BER worse than Case IV, yet V's BER$_{min}$ is lower ($1.42\times10^{-8}$ vs $1.03\times10^{-7}$).
+        \item The claims may refer to the whole BER profile rather than the minimum, but the paper does not say.
+    \end{itemize}
+    \item \textbf{Notation is loose:}
+    \begin{itemize}[noitemsep]
+        \item $x$ in (19) is called the instantaneous SNR but is defined as $|h|^2\sum p_i u_i$ summed over all slots, with no $1/N$.
+        \item The text describing constraints (25)/(26) swaps the rate and BER labels.
+        \item Re-derive from Eqs.\ (1)--(5) rather than (17)--(19).
+    \end{itemize}
+    \item \textbf{Only the COM load is actually scheduled}: everything else is FL. The TM and MM classes are never exercised on their own, and with the $[0,1]$ relaxation it is unclear how a TM load would stay strictly on/off (that would need integer variables, i.e.\ an MINLP).
+    \item \textbf{The geometry is idealized}:
+    \begin{itemize}[noitemsep]
+        \item Linear $\varepsilon(t)$ means the same overhead-pass geometry every orbit, ignoring Earth rotation and ground track.
+        \item There are no antenna gains, fading, Doppler, or link margin.
+        \item $T_{orb} = 120$ min corresponds to $a = (\mu T^2/4\pi^2)^{1/3} \approx 8060$ km, i.e.\ about 1690 km altitude, which is high for a typical CubeSat LEO.
+    \end{itemize}
+    \item Energy and generation are open-loop inputs: no battery/thermal dynamics, no SoH model, no feedback or receding horizon. This is the gap the SSA-MPC paper above addresses.
+    \item Rate is assumed to equal Shannon capacity while BER uses uncoded BPSK. Those two assumptions are not consistent with each other, though at $R \ll B$ (about 100 b/s vs 20 kHz) the BER constraint is the one that binds.
+\end{itemize}
+
+\textbf{Relevance to my work:}
+\begin{itemize}[noitemsep]
+    \item Answers my SSA-MPC question about how binary scheduling variables are handled: here they are relaxed to $[0,1]$ and fractional values are read as power levels.
+    \item My AMSAT concern still stands: this paper also assumes known pass windows and a deterministic channel. Random packet reception would need a receiver modeled as an always-on FL plus a stochastic transmit load.
+    \item GOLFProp: a resistojet burn/heater maps naturally to a TM or TMM load (burn time shiftable, heater power adjustable), and a thermal battery could add a storage term to the energy constraint $E_{cons} \le E_{bt} + E_{gen}$.
+    \item MEO/HEO SDR proposal: range, and therefore FSPL, varies far more than in LEO, so channel-aware power modulation of the transmitter should pay off more there.
+\end{itemize}
+
+\section{SPACECRAFT ATTITUDE ESTIMATION FROM VECTOR MEASUREMENTS
+USING PARTICLE FILTER}
+\subsection{Notes} 
+\begin{itemize}[noitemsep]
+    \item UKF exceeds the performance of the EKF for large initialization errors
+    \item UKF $\rightarrow$ sensitive to statistical distribution of the stochastic processes driving the system model
+    \item UKF used as baseline in this paper to compare the particle filter to.
+    \item Uses gyro and random walk vector to handle the dirft and noise on the anti-symmetric matrix $\Omega$ (what is anti-symmetric matrix?)
+    \item Direction Cosine Matrix $\rightarrow$ From spacecraft to body
+    \item Generalized rodrigues parameters $\rightarrow$ what are these exactly? Why do we care about them?
+    \item they define $\rho = b(q_{13}/(a + q_4))$ $\rightarrow$ what does this mean?
+    \item apparently you can go backwards from a quaternion to a GRP and they show this in the work
+    \item 10th order IGRF model $\rightarrow$ do they take into account the 
+    \item initial attitude errors to within $2^{\circ}$ degrees (seems like a pretty small initial error)
+    \item "This clearly shows that the estimation of attitude does converge to within their respectively required within 1000 sec, which indicates that the dual PF is performing in a near-optimal fashion" $\rightarrow$ Why does that show near-optimality?
+    \item The PF in this case converges rapidly but is much more noisy than the UKF. What is causing that?
+    \item Other than convergence time for large attitude errors, why do this? Even between the UKF and PF, the attitude still converges in less than an hour.
+    \item They don't talk about computation in terms of sheer number of calculations between the UKF and PF; how can we estimate that?
+    \item They don't give a baseline in terms of what the true attitude was at any given time. I feel like this would be helpful since they never characterize absolute error, only relative convergence time compared with the UKF
+\end{itemize}
+
+\subsection{My Summary} 
+
+This work covers a particle filter estimator for a satellite with a gyro and three-axis magnetometer. The particle filter is compared against a UKF implementation using the same model. The authors compare the particle filter representation and the UKF in terms of convergence time. This work does not compare the absolute accuracy of either method even though all data is based on simulation. It is shown that the particle filter convergence time is much shorter than the UKF when the initial uncertainties are very high. Additionally, the authors don't do anything to characterize approximate cost of either methods's calculations.
+
+This work relates to mine as a backup orbit determination is planned for the rest of this work. One thing that this work adds is a model of a tumbling spacecraft. I've done similar work on the particle filter in the past, but tumbling spacecraft which are also controlled (i.e., detumbling) can be difficult to model. This work uses generalized Rodrigues parameters (GRPs) with a quaternion to model the rotation. The GRP is a parameterization of the quaternion which decreases the dimension of the measurement vector and is well-suited for a particle filter representation.
+
+The authors provide no code and not enough information to reproduce their work. There are some sources which are cited as doing similar things as this work which may act as a better reference than this one. As this is a conference paper, they may have been limited by page count, so didn't get all their testing or findings out with the paper. 
+
+\subsection{AI Summary}
+
+\textit{Full-text summary from the PDF in \textasciitilde/Library/Papers/Thesis/OrbitAttitude. Reference: X.-Y. Jiang, G.-F. Ma, ``Spacecraft attitude estimation from vector measurements using particle filter,'' Proc.\ 4th Int.\ Conf.\ on Machine Learning and Cybernetics, Guangzhou, 18--21 Aug.\ 2005, pp.\ 682--687, doi:10.1109/ICMLC.2005.1527031. Written from the extracted text; I did not read numbers off the figures.}
+
+\textbf{Problem:}
+\begin{itemize}[noitemsep]
+    \item Estimate attitude (quaternion) and gyro bias (the paper calls it ``drift'') from a biased rate gyro and a three-axis magnetometer (TAM). A 10th-order IGRF model gives the inertial field reference.
+    \item Motivation: the EKF linearizes. The UKF handles large initial errors much better (Crassidis \& Markley, ref.\ [6]) but still assumes Gaussian statistics. A PF makes neither assumption.
+    \item Difficulty: the full state is 7-D (4 quaternion + 3 bias), and the particle count needed grows quickly with dimension. \textbf{Main contribution: a dual PF} that splits the problem into two smaller filters (attitude and bias) that feed each other.
+\end{itemize}
+
+\textbf{PF background (Sec.\ 2):}
+\begin{itemize}[noitemsep]
+    \item Bayesian recursion. Predict with Chapman--Kolmogorov: $p(x_k|y_{1:k-1}) = \int p(x_k|x_{k-1})\,p(x_{k-1}|y_{1:k-1})\,\mathrm{d}x_{k-1}$. Update with Bayes: $p(x_k|y_{1:k}) \propto p(y_k|x_k)\,p(x_k|y_{1:k-1})$.
+    \item The posterior is approximated by weighted particles, $p(x_k|y_{1:k}) \approx \sum_i w_k^i\,\delta(x_k - x_k^i)$. Sequential importance sampling updates the weights as $w_k^i = w_{k-1}^i\, p(y_k|x_k^i)\,p(x_k^i|x_{k-1}^i)/q(x_k^i|x_{0:k-1}^i, y_k)$.
+    \item \textbf{Bootstrap filter} (used here): the proposal $q$ is the transition prior, so the update reduces to $w_k^i \propto w_{k-1}^i\, p(y_k|x_k^i)$.
+    \item Degeneracy (only a few particles keep non-zero weight): monitor $\hat{N}_{\mathrm{eff}} = 1/\sum_i (w_k^i)^2$. When it falls below $N_{th}$, do systematic resampling ($O(N)$) and reset the weights to $1/N$.
+    \item Roughening afterwards: add jitter drawn from $\mathcal{N}(0, J_k)$, where $\sigma_l = G\,E_l\,N^{-1/n}$. Here $E_l$ is the spread of particle component $l$, $n$ is the state dimension, and $G$ is a tuning knob.
+\end{itemize}
+
+\textbf{Models (Sec.\ 3):}
+\begin{itemize}[noitemsep]
+    \item Quaternion $q = [q_{13}^T\ q_4]^T$, with $q_{13} = \hat{e}\sin(\phi/2)$ and $q_4 = \cos(\phi/2)$. Kinematics: $\dot{q} = \frac{1}{2}\Omega(\omega)q$. The discrete form holds $\omega$ constant over $\Delta t$, with $\psi_k = \sin(\frac{1}{2}\|\omega_k\|\Delta t)\,\omega_k/\|\omega_k\|$.
+    \item Gyro: $\tilde{\omega} = \omega + \beta + \eta_v$ and $\dot{\beta} = \eta_u$. The bias is the random walk; $\eta_v$ and $\eta_u$ are independent zero-mean white noises.
+    \item TAM: $y_k = A(q_k)\,r_k + v_k$, with $A(q) = (q_4^2 - q_{13}^Tq_{13})I_3 - 2q_4[q_{13}\times] + 2q_{13}q_{13}^T$. \textbf{$A$ maps inertial $\rightarrow$ body} (correction to my note above, which says spacecraft $\rightarrow$ body).
+\end{itemize}
+
+\textbf{Dual PF (Sec.\ 4):}
+\begin{itemize}[noitemsep]
+    \item Attitude is parameterized by GRPs, $\rho = b\,q_{13}/(a+q_4)$, with $a = 1$ and $b = 4$. The inverse is Eq.\ (17), and $q_{13} = b^{-1}(a+q_4)\rho$.
+    \item \textbf{PF 1 (attitude, $N = 1500$, state = 3 GRPs):} each particle is propagated with its own noisy rate, $\hat{\omega} = \tilde{\omega} - \hat{\beta} - \eta_v$, using $\hat{\beta}$ from PF 2. Particles are weighted by the TAM likelihood. The estimate is the weighted mean and covariance of $\rho$ (Eqs.\ 20--21). Then systematic resampling and roughening.
+    \item \textbf{PF 2 (gyro bias, $N_g$ particles; $N_g$ not given):} bias particles random-walk as $\hat{\beta}^j_{k+1} = \hat{\beta}^j_k + \eta_u$. Each one propagates the attitude to a predicted GRP. \textbf{PF 1's GRP output is treated as the ``measurement''}. The updated bias goes back into PF 1.
+    \item Initialization (Fig.\ 2, an improved version of Oshman \& Carmi, ref.\ [12]): one vector observation fixes the attitude except for the rotation about that vector. Initial particles are made by sampling that free angle, plus noise on $y_0$.
+\end{itemize}
+
+\textbf{Simulation (Sec.\ 5):}
+\begin{itemize}[noitemsep]
+    \item TAM noise $(300\ \mathrm{nT})^2$, updated every 10 s. Gyro and filter at 0.2 s. $\sigma_v = 0.31623\ \mu\mathrm{rad/s^{1/2}}$, $\sigma_u = 3.1623\times10^{-4}\ \mu\mathrm{rad/s^{3/2}}$ (Table 1 is garbled in the text extraction; I assigned these by their units).
+    \item Truth: initial attitude $[5,5,5]^T$ deg, rate $[0.01,0.01,0.01]^T$ deg/s, bias 0.1 deg/h.
+    \item \textbf{Case 1 (small error):} initial error $[2,2,2]^T$ deg; initial $\sigma$ of 0.5 deg (attitude) and 0.2 deg/h (bias); no initial bias error. The PF converges within $\sim$1000 s. The UKF settles to a \textit{lower} steady-state error.
+    \item \textbf{Case 2 (large error):} initial error $[-50, 50, 160]^T$ deg, $\sigma$ = 50 deg, bias $\sigma$ = 20 deg/h. The PF gets within 0.5 deg in $\sim$500 s. The UKF does not get within 0.5 deg until \textbf{well after 3 h}.
+    \item Conclusion: the UKF is more accurate at steady state because the PF adds Monte Carlo variation, but the PF converges much faster. Recommendation: \textbf{use the PF for initialization or large errors, then hand off to a UKF/EKF.}
+\end{itemize}
+
+\textbf{Answers to my questions:}
+\begin{itemize}[noitemsep]
+    \item \textbf{Anti-symmetric matrix:} a matrix with $M^T = -M$ (same thing as skew-symmetric). Here
+    $\Omega(\omega) = \begin{bmatrix} -[\omega\times] & \omega \\ -\omega^T & 0 \end{bmatrix}$, where $[\omega\times] = \begin{bmatrix} 0 & -\omega_3 & \omega_2 \\ \omega_3 & 0 & -\omega_1 \\ -\omega_2 & \omega_1 & 0 \end{bmatrix}$ is the cross-product matrix, $[\omega\times]v = \omega\times v$.
+    Why it matters: when $\Omega$ is anti-symmetric, $e^{\frac{1}{2}\Omega\Delta t}$ is orthogonal, so the discrete propagation in Eq.\ (10) keeps $\|q\| = 1$.
+    Correction to my note above: the random walk models the \textit{gyro bias} $\beta$. $\Omega$ itself has no noise; it is just the kinematics matrix built from the bias-corrected rate.
+    \item \textbf{GRPs:} a family of 3-parameter attitude sets made by stereographic projection of the unit-quaternion sphere (Schaub \& Junkins, ref.\ [11]). $a$ sets the projection point and $b$ scales the result.
+    \begin{itemize}[noitemsep]
+        \item $a=0,\ b=1$: Gibbs / classical Rodrigues parameters, $\hat{e}\tan(\phi/2)$, singular at 180 deg.
+        \item $a=1,\ b=1$: MRPs, $\hat{e}\tan(\phi/4)$, singular at 360 deg.
+        \item $a=1,\ b=4$ (this paper): $\rho = 4\tan(\phi/4)\,\hat{e} \approx \phi\,\hat{e}$ for small $\phi$. So \textbf{$\rho$ is approximately the rotation vector in radians}, which gives the roughening jitter and covariances physically meaningful units. At the 160 deg test error, $\|\rho\| = 4\tan 40^\circ \approx 3.36$, still far from the 360 deg singularity.
+        \item Going backwards with $a=1$, $b=4$ simplifies to $q_4 = (16 - \|\rho\|^2)/(16 + \|\rho\|^2)$ and $q_{13} = 8\rho/(16 + \|\rho\|^2)$. This is unit norm by construction.
+        \item Why we care: particles live in $\mathbb{R}^3$ rather than on the 4-D unit sphere. That means fewer dimensions (fewer particles needed), jitter or noise cannot break $\|q\| = 1$, and the covariance is non-singular. A $4\times4$ quaternion covariance is rank-deficient because of the norm constraint.
+        \item Caveat: $q$ and $-q$ map to different $\rho$ (the ``shadow set''). Also, a weighted mean of GRPs (Eq.\ 20) is only a good attitude average when the particle cloud is tight. The paper discusses neither point.
+    \end{itemize}
+    \item \textbf{IGRF (my question got cut off):} the paper only says a 10th-order IGRF is the field reference.
+    \begin{itemize}[noitemsep]
+        \item It does not say whether truth and filter use the same model. If they do, IGRF model error never shows up.
+        \item The TAM is modeled as zero-mean white noise only: no bias, misalignment, or spacecraft residual field.
+        \item The orbit and epoch are not given. This matters because a TAM only measures 2 attitude axes per sample; the third becomes observable as the field direction changes along the orbit, so convergence times depend on the orbit.
+    \end{itemize}
+    \item \textbf{2 deg initial error:} yes, it is deliberately small (Case 1); the hard case is Case 2. One thing to notice: the Case 1 prior has $\sigma = 0.5$ deg while the real error is 2 deg/axis, so the prior is $4\sigma$ overconfident. The Fig.\ 2 measurement-based initialization probably side-steps this.
+    \item \textbf{``Converges within 1000 s, so near-optimal'':} that conclusion does not follow. Convergence is not optimality.
+    \begin{itemize}[noitemsep]
+        \item Showing near-optimality takes comparing the error against the posterior Cram\'er--Rao bound (PCRB), and/or showing filter consistency (NEES) over Monte Carlo runs.
+        \item Neither is done, and the number of Monte Carlo runs is never stated.
+        \item Their own result (the UKF reaches lower steady-state error) argues \textit{against} PF steady-state optimality.
+    \end{itemize}
+    \item \textbf{Why the PF is noisier than the UKF:}
+    \begin{itemize}[noitemsep]
+        \item Monte Carlo error: the estimate is a finite-sample average, so its error scales like $1/\sqrt{N}$.
+        \item Roughening deliberately injects jitter at every resample, which acts like extra process noise.
+        \item The bootstrap proposal ignores the newest measurement, so when the likelihood is tight relative to the prior, few particles land where it matters. That causes degeneracy and frequent resampling.
+        \item The dual split ignores the attitude--bias cross-correlation that a joint UKF carries.
+        \item Scale of the measurement noise: each TAM sample is only good to roughly $300\,\mathrm{nT}/\|B\|$. For $\|B\| \approx 20$--$50\ \mu$T in LEO, that is $\sim$0.3--0.9 deg. A Kalman filter fuses many such samples with the gyro optimally; the PF's ability to average is limited by resampling and roughening.
+    \end{itemize}
+    \item \textbf{Why bother? (``both converge in under an hour''):} correction: in Case 2 the UKF takes \textbf{well over 3 h} to reach 0.5 deg, compared with $\sim$500 s for the PF. The real use cases are:
+    \begin{itemize}[noitemsep]
+        \item Initial acquisition with no good prior (after detumble or safe mode).
+        \item Magnetometer-only phases such as eclipse with no sun sensor, where one vector leaves the posterior ring-shaped / non-Gaussian, which a KF cannot represent.
+        \item Non-Gaussian noise.
+    \end{itemize}
+    If a second vector is available (sun + mag), a deterministic TRIAD/QUEST fix (see my 2026-06-28 TRIAD notes) initializes an EKF/UKF almost for free. The PF mainly pays off when only one vector is available.
+    \item \textbf{Computation (not reported in the paper), rough estimate:}
+    \begin{itemize}[noitemsep]
+        \item \textit{UKF}: $2n+1 = 13$ sigma points for $n = 6$ (3 attitude error + 3 bias; more if augmented with noise). Plus a $6\times6$ Cholesky and covariance sums: on the order of $10^3$ flops per step.
+        \item \textit{PF 1, per particle per 0.2 s step}: 3 Gaussian draws, $\|\omega\|$ (sqrt), one sin and one cos (each particle has its own noisy $\omega$), a quaternion product (16 mul + 12 add), and GRP$\leftrightarrow q$ conversions. About 50--100 flops + 2 trig + 3 RNG.
+        \item \textit{PF 1, every TAM update (every 10 s)}: also $A(q)r$, the residual, one exp, normalization, $O(N)$ resampling, and 3 more draws for roughening.
+        \item With $N = 1500$: about $10^5$ flops + 3000 trig + 4500 Gaussian draws per step. On top of that is PF 2, which propagates attitude for each of its $N_g$ particles.
+        \item Ratio: about $N/(2n+1) \approx 1500/13 \approx 100\times$ the UKF's propagation work. RNG and transcendental functions usually dominate on an MCU, so the real ratio may be higher.
+        \item Best check: implement both and time them on the target OBC. The per-particle work is embarrassingly parallel.
+    \end{itemize}
+    \item \textbf{No truth baseline:} partly true. Figs.\ 3 and 5 overlay truth (solid) and estimate (dashed), and Figs.\ 4 and 6 plot the norm of the attitude error against truth, so absolute error \textit{is} shown, but only as plots. Missing: steady-state/RMS numbers, $3\sigma$ bounds, Monte Carlo statistics, and any bias-estimation results.
+\end{itemize}
+
+\textbf{Things to watch when citing:}
+\begin{itemize}[noitemsep]
+    \item Typo: ``the dual PF converges to a higher error value than the PF'' should say ``than the UKF'' (per the conclusions).
+    \item Not reproducible: the Monte Carlo run count, $N_g$, $N_{th}$, $G$, the Fig.\ 2 angle spread $\Delta\varphi$, and the UKF $(\alpha,\beta,\kappa)$ are not given. They criticize the UKF's tuning sensitivity, but the PF has its own tuning ($N$, $N_{th}$, $G$).
+    \item \textbf{Half the contribution (gyro bias estimation) has no results shown}: all four figures are attitude only.
+    \item Dual-filter weakness: PF 2's ``measurement'' is PF 1's output, which was itself computed with PF 2's bias. That correlation is ignored.
+    \item Fig.\ 2 as extracted: the jitter rotation $\delta e$ appears to use the axis $y\times r_0$, the same axis as $e$. The free degree of freedom should be a rotation \textit{about} the observed vector. This may be a paper typo or extraction damage; check against ref.\ [12] before implementing.
+    \item ``Fully actuated rigid body'' is claimed, but no dynamics or control law is given. Truth appears to be constant-rate kinematics. The orbit is never specified.
+    \item Venue: a 2005 conference paper (ICMLC), not a journal paper.
+\end{itemize}
+
+\textbf{Relevance to my work:}
+\begin{itemize}[noitemsep]
+    \item \textbf{Inertia-tensor estimator (11-05 action item):} the dual structure (a state filter plus a parameter filter feeding each other) is a template for estimating $J$ after a burn. It inherits the same ignored cross-correlation; the usual alternative is a joint UKF with $J$ augmented into the state.
+    \item \textbf{Battery magnetic materials (11-05 action item):} a residual spacecraft dipole shows up as a body-frame TAM bias, which this paper does not model. A 3-state magnetometer bias could sit in the second filter next to the gyro bias.
+    \item \textbf{GOLFProp:} large attitude error after a burn or tumble is exactly Case 2, where a PF or deterministic initializer followed by a UKF/MEKF hand-off is the paper's recommended pattern.
+\end{itemize}
+\end{document}

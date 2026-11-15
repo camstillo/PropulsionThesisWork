@@ -77,7 +77,68 @@
 I am studying cubesat resistojet propulsion systems because I want to find out if power consumption, size, and mass can be improved in order to help readers utilize the learnings from this project to integrate similar systems on their spacecraft.
 
 \subsection{Citeable Notes (F6)}
-\textit{[2 to 3 citeable notes per paper, each with \textbackslash cite\{key\}.]}
+
+\subsection{Finite-time attitude set-point tracking for thrust-vectoring spacecraft rendezvous}
+
+\textbf{Citable Notes} 
+
+\begin{enumerate}
+    \item \cite{zhangFinitetimeAttitudeSetpoint2020} shows that the optimal attitude and $\Delta v$ parameters can be independently solved for with different methods. Given the much more complex orbital solution, the attitude pointing solution becomes a closed-form optimization via the multiplier method. 
+    \item Providing an improved particle swarm optimization (PSO) algorithm, \cite{zhangFinitetimeAttitudeSetpoint2020} advances PSO techniques for both $\Delta v$ and firing time to meet some targeted rendezvous point. One contstraint on the utility of this method is that PSO, no matter how thorough, does not guarantee a global minimum on the search space.
+\end{enumerate} 
+
+\textbf{My Summary}
+
+This work claims that a spacecraft rendezvous system can be created which uses a heuristic optimization method (Particle swarm optimization) which allows a separate pointing solution to be solved in closed form. The simulated spacecraft is a single-thruster satellite which is attempting to meet with a target satellite in a non-concentric orbit. Given the initial position of the first satellite, what's the best time and $\Delta v$ requirements for a series of burns to get to meet with the satellite. This is solved for with an improved particle swarm optimization, a type of heuristic optimization where a local minima is found. The authors improve on this algorithm with a custom implementation that reduces $\Delta v$ requirements. In addition, this paper shows that once the burn timing and $\Delta v$ are solved for, the pointing solution can be solved in closed form using the method of multipliers. They solve this with a lyapunov function. 
+
+This optimization method is demonstrated in a four-burn orbital transfer which successfully meets with a target spacecraft. Their PSO method is only marginally better than the existing PSO, and might not be worth using in many cases. Their work also gives a framework, but only tests it over a single orbital maneuver; it does not show the effects of not meeting their assumptions or over different orbital conditions. Cubesat propulsion might have a difficult time with this method as their thrusters are much less powerful, which adds additional constraints that may make PSO fail. They don't compare against a baseline method other than their improved PSO and the standard PSO algorithms, as other methods for orbital transfers might struggle to meet these goals. Their measurement is based only on how much $\Delta v$ was used (i.e., fuel consumed for the maneuver).
+
+As far as supporting work, code and data are not available, but the paper does include their solution parameters to remake their existing code. If I were to use this in my own work, the pointing solution would need to be updated to account for the maximum-power path as well as the pointing solution. For a near-circular orbit, the timing and $\Delta v$ would already be determined beforehand asmy work doesn't include a dimension to track a target spacecraft. Adding the dimension of the spacecraft power generation may move that solution out of its closed form, since speed isn't the only thing we need.
+
+\subsection{Self-Adaptive Energy-Aware Power Management for CubeSat Electrical Power Systems Under Dynamic Orbital Conditions}
+
+\textbf{Citable Notes} 
+
+\begin{enumerate}
+    \item \cite{akarneSelfAdaptiveEnergyAwarePower2026} demonstrates a simulated sparrow-search algorithm (SSA) to tune MPC parameters to adaptively correct the time horizon and cost function associated with the MPC algorithm.
+    \item Generating a model of a spacecraft power system, \cite{akarneSelfAdaptiveEnergyAwarePower2026} improves upon battery state of health (SOH) over a two-year period using an adaptive MPC algorithm to manage power usage over varying orbital conditions. The model could be extended to handle a thermal battery in parallel with a electric battery.
+    \item Using an adaptively-tuned MPC algorithm, \cite{akarneSelfAdaptiveEnergyAwarePower2026} reports an increase in on-demand bus power. Its algorithm is robust to variations in orbital conditions and manages spacecraft power by predicting future loading and power generation.
+\end{enumerate} 
+
+\textbf{My Summary} 
+
+This work provides a framework for improving model-predictive control algorithms for spacecraft power management. Model-predictive control utilizes a time horizon and cost weight parameters to determine what features get most optimized for over time. This work's innovation is to handle adaptively tuning this MCP optimization strategy with a sparrow-search algorithm (SSA) that automatically tunes the MPC parameters to take into account the power generation, load needs, and future orbital states. The SSA-MPC algorithm is compared with a fixed-parameter MPC as a baseline over a single orbit.
+
+The SSA-MPC also takes into account external spacecraft parameters like termperatures and eclipse times. Using a model of battery state of health (SOH) degredation over time, the battery is shown to have dropped 4\% less in SOH over a fixed-parameter MCP. It also shows that the margin of residual power leftover during the eclipse period can be much greater in different orbital conditions. Overall, their claim that their method is more energy-efficient than existing methods is certainly shown.
+
+They don't take into account orbital variation well and don't consider loads with probabilistic models of load consumption. For example, a communication payload does not have the ability to be scheduled like other loads. Packets arrive randomly and must be processed and responded to, which is a significant load on the satellite. The power this operation consumes is therefore based on the probability of packets arriving in the first place. In addition, they do a monte-carlo analysis over variations in an orbit, but don't consider a change in orbit like a thruster would take. What happens if orbital parameters change completely? This seems like a good way to handle that, but they don't show it. 
+
+This relates exactly to my work as the satellite with the propulsion system on it adds a thermal battery for energy storage which has its own heath degredation over time. To prepare for a firing, the load would have to adapt to the additional thruster payload, which is how we might be able to keep the satellite running even with the extra payload of the thruster.
+
+\subsection{Spacecraft Attitude Estimation from Vector Measurements Using Particle Filter} 
+\textbf{Citable Notes} 
+
+\begin{itemize}
+    \item \cite{xue-yuanjiangSpacecraftAttitudeEstimation2005} constructs a particle filter (PF) implementation of an attitude estimator using gyro and three-axis magnetometer (TAM) measurements, reporting an increase in convergence time between a UKF and PF implementation of the same algorithm.
+    \item Focusing on convergence between the UKF and PF implementation, \cite{xue-yuanjiangSpacecraftAttitudeEstimation2005} demonstrates that the PF outperforms the UKF in terms of convergence time for attitude estimation. Unfortunately, this work gives no indication of why the PF outperforms the UKF in terms of convergence time or the absolute attitude error. 
+\end{itemize}
+
+\textbf{My Summary} 
+
+This work covers a particle filter estimator for a satellite with a gyro and three-axis magnetometer. The particle filter is compared against a UKF implementation using the same model. The authors compare the particle filter representation and the UKF in terms of convergence time. This work does not compare the absolute accuracy of either method even though all data is based on simulation. It is shown that the particle filter convergence time is much shorter than the UKF when the initial uncertainties are very high. Additionally, the authors don't do anything to characterize approximate cost of either methods's calculations.
+
+This work relates to mine as a backup orbit determination is planned for the rest of this work. One thing that this work adds is a model of a tumbling spacecraft. I've done similar work on the particle filter in the past, but tumbling spacecraft which are also controlled (i.e., detumbling) can be difficult to model. This work uses generalized Rodrigues parameters (GRPs) with a quaternion to model the rotation. The GRP is a parameterization of the quaternion which decreases the dimension of the measurement vector and is well-suited for a particle filter representation.
+
+The authors provide no code and not enough information to reproduce their work. There are some sources which are cited as doing similar things as this work which may act as a better reference than this one. As this is a conference paper, they may have been limited by page count, so didn't get all their testing or findings out with the paper. 
+
+\subsection{AI Report Summary} 
+
+I had AI create reports of all three papers since it wasn't that much extra work. I was really surprised at how much it got right compared with what the lecture had said for this week. My strategy was to read and take notes, then have the AI convert the paper to a text file with the PDF conversion tools, read it, answer the questions I put above, and summarize what it said. This way, the paper would be copied directly from the source instead of the model trying to pull it from its weights. This worked well: there were very few mistakes and it was pretty much always able to answer my questions. I think the biggest thing it misses is the connection to my work. For example, in the first paper I read, it did a lot of qualification and explanation of the particle swarm optimization. While that was interesting, I don't think it's quite what I needed because my work isn't going to use that technique at all. I was only looking for the pointing part and it doesn't say anything about how to meet the goals outlined in my prospectus. Also, coming up with ideas even given context of what my project is usually is not worthwhile from AI, in my opinion. 
+
+There were definitely things it got wrong or misunderstood. In the second paper I read, it added an entire section of notes on the antenna gains, doppler fading, and pass geometry. This actually has very little to do with the paper. I suppose it's not technically wrong, but completely irrelevant and would have confused me had I not read the paper. For the last paper I read, I had a question about why they qualify something when both orbits converged in a very short amount of time. This was based on one of the plots that they show in the paper. The AI claimed that the convergence was 3 hours for one and 1 hour for the other. I have no idea where this came from, as the text never discusses this numerically. The AI was not able to read the plot and just made something up.
+
+I think that the summaries were not helpful in comparison to just reading the paper. They essentially wrap everything I didn't understand into a more dense and less readable form. They have even less context than the paper does and I don't entirely trust it since I don't understand it well. If there was a mistake, I wouldn't necessarily catch it in something I'm unfamiliar with. I think the best use of it is to answer specific question from my notes on the paper. Asking AI to help once the paper is somewhat understood or having it recreate the code for some result might be helpful. At the end of the day, I would want to thoroughly understand what the paper says rather than repeat what an AI says.
+
 
 \subsection{Synthesis Matrix and Argument Outline (F7)}
 \textit{[Matrix: one row per paper; mark each cell verified.]}\par
