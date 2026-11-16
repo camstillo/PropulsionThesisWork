@@ -89,7 +89,7 @@ I am studying cubesat resistojet propulsion systems because I want to find out i
 
 \textbf{My Summary}
 
-This work claims that a spacecraft rendezvous system can be created which uses a heuristic optimization method (Particle swarm optimization) which allows a separate pointing solution to be solved in closed form. The simulated spacecraft is a single-thruster satellite which is attempting to meet with a target satellite in a non-concentric orbit. Given the initial position of the first satellite, what's the best time and $\Delta v$ requirements for a series of burns to get to meet with the satellite. This is solved for with an improved particle swarm optimization, a type of heuristic optimization where a local minima is found. The authors improve on this algorithm with a custom implementation that reduces $\Delta v$ requirements. In addition, this paper shows that once the burn timing and $\Delta v$ are solved for, the pointing solution can be solved in closed form using the method of multipliers. They solve this with a lyapunov function. 
+This work claims that a spacecraft rendezvous system can be created which uses a heuristic optimization method (Particle swarm optimization) which allows a separate pointing solution to be solved in closed form. The simulated spacecraft is a single-thruster satellite which is attempting to meet with a target satellite in a non-concentric orbit. Given the initial position of the first satellite, what's the best time and $\Delta v$ requirements for a series of burns to get to meet with the satellite. This is solved for with an improved particle swarm optimization, a type of heuristic optimization where a local minima is found. The authors improve on this algorithm with a custom implementation that reduces $\Delta v$ requirements. In addition, this paper shows that once the burn timing and $\Delta v$ are solved for, the pointing solution can be solved in closed form using the method of multipliers. They solve this with a lyapunov function.
 
 This optimization method is demonstrated in a four-burn orbital transfer which successfully meets with a target spacecraft. Their PSO method is only marginally better than the existing PSO, and might not be worth using in many cases. Their work also gives a framework, but only tests it over a single orbital maneuver; it does not show the effects of not meeting their assumptions or over different orbital conditions. Cubesat propulsion might have a difficult time with this method as their thrusters are much less powerful, which adds additional constraints that may make PSO fail. They don't compare against a baseline method other than their improved PSO and the standard PSO algorithms, as other methods for orbital transfers might struggle to meet these goals. Their measurement is based only on how much $\Delta v$ was used (i.e., fuel consumed for the maneuver).
 
@@ -143,6 +143,53 @@ I think that the summaries were not helpful in comparison to just reading the pa
 \subsection{Synthesis Matrix and Argument Outline (F7)}
 \textit{[Matrix: one row per paper; mark each cell verified.]}\par
 \textit{[Argument outline: themes, claims, supporting papers, gap.]}
+
+\textbf{Topic: Power generation can be scheduled to handle changing orbital conditions (no AI used)} 
+
+\begin{longtable}{@{}p{0.08\linewidth}p{0.24\linewidth}p{0.13\linewidth}p{0.12\linewidth}p{0.15\linewidth}p{0.15\linewidth}@{}}
+  \toprule
+    Paper & Approach & Baseline & Metric & Result & Limitation \\
+  \midrule
+  \endhead
+    \cite{husseinOptimizedLoadSchedulingAlgorithm2023} & 
+    \begin{itemize}\setlength\itemsep{0pt}
+        \item Fixed scheduling: power is optimized over a fixed time horizon.
+        \item BER and data link: maximize the power to the data link when channel supports it
+        \item Place different loads into different categories by time, magnitude, or time and magnitude
+    \end{itemize} &
+    Compared to timing based communication approach &
+    BER, energy consumed, data rate& 
+    significantly reduced BER over naive approach & 
+    Model of other satellite loads and power generation is extremely simple \\
+
+    \cite{akarneSelfAdaptiveEnergyAwarePower2026} & 
+    \begin{itemize}\setlength\itemsep{0pt}
+        \item Modifed MPC approach where parameters are adaptively tuned given what is known about the orbit.
+        \item Battery SOH, power generation, and external loads are significantly more realistic compared with other studies.
+        \item Manages battery storage SOC and temperature
+        \item Accounts for future power generation and loading
+    \end{itemize} &
+    Compared to bare MPC approach &
+    Battery SOC, Battery SOH, residual power & 
+    4\% improvement on SOH over 2-year period and increased residual power available in eclipse & 
+    Doesn't actually simulate over multiple orbits; no estimators of system parameters from noisy measurements \\
+
+    
+    \cite{doff-sottaSpacecraftEnergyManagement2022} & 
+    \begin{itemize}\setlength\itemsep{0pt}
+        \item Introduces a fully-convex optimization method for a GEO satellite power system 
+        \item Fully open-loop: doesn't really control for anything except battery SOC and temperature
+        \item Satellite model is much larger than standard cubesat formfactor (on order of 35 kW power allocation)
+        \item Pushes towards convexity by assuming that heat generation and external factors can all be assumed beforehand; no measurements of real parameters
+        \item Optimization is meant to maximize power allocated to secondary tasks while taking into account necessary loads.
+    \end{itemize} &
+    Compared to bare MPC approach &
+    Battery stored energy and computation time& 
+    Improvement on battery storage over singular orbit & 
+    Doesn't take into account any real measurements in the satellite; I don't really trust that the measurements the paper presents would be accurate in space. \\
+  \bottomrule
+\end{longtable}
+
 
 \subsection{First Version of My Focus Statement (F9)}
 \textit{[Your own version, before any AI help.]}
