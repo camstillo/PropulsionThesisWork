@@ -158,8 +158,8 @@ I think that the summaries were not helpful in comparison to just reading the pa
     \end{itemize}
     \end{minipage} &
     Compared to timing based communication approach &
-    BER, energy consumed, data rate& 
-    significantly reduced BER over naive approach & 
+    BER, energy consumed, data rate&
+    significantly reduced BER over naive approach &
     Model of other satellite loads and power generation is extremely simple \\
     \addlinespace
 
@@ -249,37 +249,66 @@ I think that the summaries were not helpful in comparison to just reading the pa
   \bottomrule
 \end{longtable}
 
-\textit{[Argument outline: themes, claims, supporting papers, gap.]}
 \subsection{Argument Outline} 
 \textbf{Themes:}
-\begin{enumerate}[noitemsep]
+\begin{enumerate}
     \item Power scheduling is a separate optimization task which can be scheduled to adapt to changing orbital conditions.
-    \begin{itemize}[noitemsep]
+    \begin{itemize}
         \item Power scheduling tasks are structured by the problem attempting to be solved.
         \item Maximize power to load, maximize available power at any time, minimize battery degredation over time, and minimize unused power.
         \item \cite{husseinOptimizedLoadSchedulingAlgorithm2023} demonstrates a method of load scheduling to maximize power to a communication link when the link is most likely to be successful (BER is minimized). 
         \item Although successfully minimizing BER, the method employed here is simplistic given changing mission and orbital conditions. 
-        \item Their model never takes into account pointing requirements, designating everything not involved with the communication link as a fixed load.
-        \item \cite{doff-sottaSpacecraftEnergyManagement2022} implements a fully-confex formulation of the power problem for a much larger spacecraft.
-        \item This work assumes that generated power will generate more energy than can be stored in batteries onboard. 
-        \item In addition, no pointing constraints, feedback from the system, or control over loads is considered.
+        \item Their model never takes into account pointing requirements, designating everything not involved with the communication link as a fixed load. 
+        \item This also assumes that the communication payload is fixed and must be sent at intervals which maximize LOS (not necessarily true in this case, as operations happen at a random and constant rate with this mission)
+        \item \cite{doff-sottaSpacecraftEnergyManagement2022} implements a fully-confex formulation of the power problem for a much larger spacecraft, and shows how certain constraints could be made into convex constraints, thereby making the problem much easier and faster to solve.
+        \item This work assumes that generated power will generate more energy than can be stored in batteries onboard.  
+        \item In addition, no pointing constraints, feedback from the system (entirely open-loop control), or control over indiviual loads is considered.
+        \item This work requires that the slewing control be taken into account, as well as maximizing the power to a specific load; still understanding that some constraints could be made convex is useful
     \end{itemize}
     \item This mission specifically is well-suited for power scheduling since the goal is to optimize over many load conditions.
-    \begin{itemize}[noitemsep]
+    \begin{itemize}
         \item This mission's goal is to maximize available power up to the burn from the propulsion system.
         \item The propulsion system should be fed all available power to phase the PCM in as little time as possible.
         \item From experiments, it will take at least 2 hours at maximum power to get to temperture.
         \item \cite{akarneSelfAdaptiveEnergyAwarePower2026} demonstrates a method of managing multiple loads at once while maximimizing battery state of charge and minimizing battery wear over time.
-        \item This formulation could be expanded to include the load of the thermal battery included with the propulsion system.
+        \item This work creates model predictive control algorithm which iteratively searches for model optimization parameters using a sparrow search algorithm
+        \item It is able to account for orbital changes and handle multiple, time and magnitude-varying loads.
+        \item There is no formulation of a probabilistic model of radio transmission for AMSAT needs (for example, packets aren't dependent on specific ground stations, but are coming as discrete bursts as people send packets all over the world).
+        \item The gap comes as they don't simulate over an orbital change or plan for the specific situation that our satellite will be in. This formulation could be expanded to include the load of the thermal battery and PCM degredation included with the thermal battery.
     \end{itemize}
     \item The optimal pointing solution has a closed-form solution when time is the objective, but requires a non-linear optimization schedule when maximum power is desired.
-    \begin{itemize}[noitemsep]
+    \begin{itemize}
         \item The thruster is aligned with a single axis of the spacecraft, and the pointing direction necessary for thrust will require slewing into a certain position.
         \item In addition, there may be communication tasks which require some amount of slewing to get into position.
-        \item 
+        \item \cite{zhangFinitetimeAttitudeSetpoint2020} demonstrates that once a set of burns for a maneuver is known (solved for there using a multi-objective PSO) the power-minimizing pointing objective can be found using a closed-form solution
+        \item Their work is for a much larger satellite (gap) and does not require that a satellite maintains optimal pointing towards the sun at all times.
+        \item Also assumes that we require a complex PSO solution to solve for the burn $\Delta v$ and times, which may be true if we need to make multiple burns to meet the orbital transfer goals that would be required.
+        \item \cite{kristiansenEnergyOptimalAttitude2024} builds off existing work to form an non-linear optimization for maximizing power when slewing to a set of positions for both communication and payload tasks
+        \item Their formulation is much more complex and utilizes a non-linear solver(IPOPT) to handle the optimal slewing, although they generate $\approx$ 40\% more energy over the entire maneuver while meeting their much more complex pointing requirements than this mission requires.
+        \item They generate a good model of reaction wheel and magnetorquer dynamics which could be used in other formulations where we're trying to also balance loading with the propulsion system.
+        \item This model lacks any type of pointing for propulsion: a highly-weighted objective should happen at the highest $v$ point to slew the satellite into the direction of motion of the bird.
     \end{itemize}
     \item A sequential PF to UKF algorithm is well-suited to potentially detumble after firing to reduce computation time.
+    \begin{itemize}
+        \item \cite{xue-yuanjiangSpacecraftAttitudeEstimation2005} utilizes a particle filter to estimate the attitude of the satellite given gyroscoping and three-axis magnetometer (TAM) measurements. 
+        \item Their work is more of a demonstration than analytical proofs of certain features of the particle filter; they show that the particle filter converges faster for large initial estimation errors when compared with a UKF implementation of the same algorithm.
+        \item The gap in their work is that they never check against absolute error, only relative to the error of the UKF, and have no explanation of some of the features of the particle filter.
+        \item This work proposes to handle a more rigorously tested algorithm that tests their conclusions over more cases, and adds in orbital estimation or some kind of hybrid estimation utilizing GPS measurements as well.
+    \end{itemize}
 \end{enumerate}
+
+
+\begin{framed}
+    \textbf{AI Text Generation Prompt: }
+    I've written up an outline for a literature review section in @appendices/
+    my\_material.tex (see the bottom of the page). I would like you to write a 1.5-2 page literature review based on that outline, using exactly the citations that I use in the materials section in @sections/literature\_review.tex. Please create a copy of your writing and place it in sections/litreview\_ai\_v0.tex as well as adding \texttt{\\trackededits{litreview\_ai\_v0}} in @appendices/tracked\_edits.tex and an addition in @appendices/ai\_use\_log.tex for what you did. You can find my notes on each one of these papers at ~/.local/share/lx/notes/20261002-propulsion-notes-runnign.tex and you can find the papers in ~/Library/Papers/Thesis/ in directories associated with their topics. Feel free to convert these to text to understand what's being said in each of them. Try to stick to claims in the actual material instead of running off things you remember; if you can't find a source for it in my notes or one of the papers, you probably should leave it as a question. Feel free to leave comments as questions to me or things that you think I might have gotten wrong.
+\end{framed}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{ResearchConnections.png}
+    \caption{ResearchRabbit search on core papers colored by red (pointing), purple (power), blue (orbit/attitude), and white (not in collection). I have added some of these papers to my collection since creating this graph.}
+\end{figure}
 
 \subsection{First Version of My Focus Statement (F9)}
 \textit{[Your own version, before any AI help.]}
