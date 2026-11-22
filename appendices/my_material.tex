@@ -141,10 +141,8 @@ I think that the summaries were not helpful in comparison to just reading the pa
 
 
 \subsection{Synthesis Matrix and Argument Outline (F7)}
-\textit{[Matrix: one row per paper; mark each cell verified.]}\par
-\textit{[Argument outline: themes, claims, supporting papers, gap.]}
 
-\textbf{Topic: Power generation can be scheduled to handle changing orbital conditions (no AI used)} 
+\textbf{Topic: Power generation can be scheduled to handle changing orbital conditions (no AI used)}
 
 \begin{longtable}{@{}p{0.08\linewidth}p{0.24\linewidth}p{0.13\linewidth}p{0.12\linewidth}p{0.15\linewidth}p{0.15\linewidth}@{}}
   \toprule
@@ -152,44 +150,136 @@ I think that the summaries were not helpful in comparison to just reading the pa
   \midrule
   \endhead
     \cite{husseinOptimizedLoadSchedulingAlgorithm2023} & 
-    \begin{itemize}\setlength\itemsep{0pt}
+    \begin{minipage}[t]{\linewidth}
+    \begin{itemize}[nosep, left-margin=1em]
         \item Fixed scheduling: power is optimized over a fixed time horizon.
         \item BER and data link: maximize the power to the data link when channel supports it
-        \item Place different loads into different categories by time, magnitude, or time and magnitude
-    \end{itemize} &
+        \item Place different loads into different categories by time, magnitude, or time and magnitude\strut
+    \end{itemize}
+    \end{minipage} &
     Compared to timing based communication approach &
     BER, energy consumed, data rate& 
     significantly reduced BER over naive approach & 
     Model of other satellite loads and power generation is extremely simple \\
+    \addlinespace
 
     \cite{akarneSelfAdaptiveEnergyAwarePower2026} & 
-    \begin{itemize}\setlength\itemsep{0pt}
+    \begin{minipage}[t]{\linewidth}
+    \begin{itemize}[nosep, left-margin=1em]
         \item Modifed MPC approach where parameters are adaptively tuned given what is known about the orbit.
         \item Battery SOH, power generation, and external loads are significantly more realistic compared with other studies.
         \item Manages battery storage SOC and temperature
-        \item Accounts for future power generation and loading
-    \end{itemize} &
+        \item Accounts for future power generation and loading\strut
+    \end{itemize}
+    \end{minipage} &
     Compared to bare MPC approach &
     Battery SOC, Battery SOH, residual power & 
     4\% improvement on SOH over 2-year period and increased residual power available in eclipse & 
     Doesn't actually simulate over multiple orbits; no estimators of system parameters from noisy measurements \\
-
+    \addlinespace
     
     \cite{doff-sottaSpacecraftEnergyManagement2022} & 
-    \begin{itemize}\setlength\itemsep{0pt}
+    \begin{minipage}[t]{\linewidth}
+    \begin{itemize}[nosep, left-margin=1em]
         \item Introduces a fully-convex optimization method for a GEO satellite power system 
         \item Fully open-loop: doesn't really control for anything except battery SOC and temperature
         \item Satellite model is much larger than standard cubesat formfactor (on order of 35 kW power allocation)
         \item Pushes towards convexity by assuming that heat generation and external factors can all be assumed beforehand; no measurements of real parameters
-        \item Optimization is meant to maximize power allocated to secondary tasks while taking into account necessary loads.
-    \end{itemize} &
+        \item Optimization is meant to maximize power allocated to secondary tasks while taking into account necessary loads.\strut
+    \end{itemize}
+    \end{minipage} &
     Compared to bare MPC approach &
-    Battery stored energy and computation time& 
-    Improvement on battery storage over singular orbit & 
+    Battery stored energy and computation time&
+    Improvement on battery storage over singular orbit &
     Doesn't take into account any real measurements in the satellite; I don't really trust that the measurements the paper presents would be accurate in space. \\
   \bottomrule
 \end{longtable}
 
+\textbf{Topic: Pointing can be optimized for time or power (no AI used)} 
+\begin{longtable}{@{}p{0.08\linewidth}p{0.24\linewidth}p{0.13\linewidth}p{0.12\linewidth}p{0.15\linewidth}p{0.15\linewidth}@{}}
+  \toprule
+    Paper & Approach & Baseline & Metric & Result & Limitation \\
+  \midrule
+  \endhead
+    \cite{zhangFinitetimeAttitudeSetpoint2020} & 
+    \begin{minipage}[t]{\linewidth}
+    \begin{itemize}[nosep, left-margin=1em]
+        \item Optimize first for $\Delta v$ then the Pointing optimization can be done in closed form.
+        \item Utilize PSO instead of a better optimization technique to handle the multi-transfer, high-dimensional problem.
+        \item Assume a large satellite that has the capability of making a multi-burn orbital transfer.\strut
+    \end{itemize}
+    \end{minipage} &
+    Not compared against other techniques &
+    Time and accuracy of the maneuver (did the chaser meet the rendezvous?) & 
+    Successful implemention over a single multi-transfer maneuver&  
+    No actual optimality; Only solve for optimized-time pointing maneuver \\
+    \addlinespace
+    \cite{kristiansenEnergyOptimalAttitude2024} & 
+    \begin{minipage}[t]{\linewidth}
+    \begin{itemize}[nosep, left-margin=1em]
+        \item Created a power-based cost function to minimize the control objective while maximizing energy generation (pointing)
+        \item Simulated control technique over a multi-objective orbit and calculated power generation.
+        \item Included eclipse period in optimization formulation solved with IPOPT and CasADi.\strut
+   \end{itemize}
+   \end{minipage} &
+    Proportional-Derivative controller doing the same task &
+    Final pointing error and increase in energy generation & 
+    39\% increase in energy generation while meeting pointing spec. &  
+    Not feasible for real-time applications; not well-suited for propulsive maneuvers \\
+  \bottomrule
+\end{longtable}
+
+\textbf{Topic: Particle filters can be used to estimate attitude of a spacecraft (no AI used)} 
+\begin{longtable}{@{}p{0.08\linewidth}p{0.24\linewidth}p{0.13\linewidth}p{0.12\linewidth}p{0.15\linewidth}p{0.15\linewidth}@{}}
+  \toprule
+    Paper & Approach & Baseline & Metric & Result & Limitation \\
+  \midrule
+  \endhead
+    \cite{xue-yuanjiangSpacecraftAttitudeEstimation2005} & 
+    \begin{minipage}[t]{\linewidth}
+    \begin{itemize}[nosep, left-margin=1em]
+        \item Utilize Gyro and TAM as estimator inputs for state estimation of the attitude of the satellite.
+        \item Develop model of spacecraft attitude which handles tumbling and any rotation.\strut
+    \end{itemize}
+    \end{minipage} &
+    Unscented Kalman Filter using the same model & 
+    Convergence time and initial attitude covariance &
+    Inproved convergence time for high-uncertainty systems &
+    No baseline error calculation against absolute attitude error; doesn't account for propulsion \\
+  \bottomrule
+\end{longtable}
+
+\textit{[Argument outline: themes, claims, supporting papers, gap.]}
+\subsection{Argument Outline} 
+\textbf{Themes:}
+\begin{enumerate}[noitemsep]
+    \item Power scheduling is a separate optimization task which can be scheduled to adapt to changing orbital conditions.
+    \begin{itemize}[noitemsep]
+        \item Power scheduling tasks are structured by the problem attempting to be solved.
+        \item Maximize power to load, maximize available power at any time, minimize battery degredation over time, and minimize unused power.
+        \item \cite{husseinOptimizedLoadSchedulingAlgorithm2023} demonstrates a method of load scheduling to maximize power to a communication link when the link is most likely to be successful (BER is minimized). 
+        \item Although successfully minimizing BER, the method employed here is simplistic given changing mission and orbital conditions. 
+        \item Their model never takes into account pointing requirements, designating everything not involved with the communication link as a fixed load.
+        \item \cite{doff-sottaSpacecraftEnergyManagement2022} implements a fully-confex formulation of the power problem for a much larger spacecraft.
+        \item This work assumes that generated power will generate more energy than can be stored in batteries onboard. 
+        \item In addition, no pointing constraints, feedback from the system, or control over loads is considered.
+    \end{itemize}
+    \item This mission specifically is well-suited for power scheduling since the goal is to optimize over many load conditions.
+    \begin{itemize}[noitemsep]
+        \item This mission's goal is to maximize available power up to the burn from the propulsion system.
+        \item The propulsion system should be fed all available power to phase the PCM in as little time as possible.
+        \item From experiments, it will take at least 2 hours at maximum power to get to temperture.
+        \item \cite{akarneSelfAdaptiveEnergyAwarePower2026} demonstrates a method of managing multiple loads at once while maximimizing battery state of charge and minimizing battery wear over time.
+        \item This formulation could be expanded to include the load of the thermal battery included with the propulsion system.
+    \end{itemize}
+    \item The optimal pointing solution has a closed-form solution when time is the objective, but requires a non-linear optimization schedule when maximum power is desired.
+    \begin{itemize}[noitemsep]
+        \item The thruster is aligned with a single axis of the spacecraft, and the pointing direction necessary for thrust will require slewing into a certain position.
+        \item In addition, there may be communication tasks which require some amount of slewing to get into position.
+        \item 
+    \end{itemize}
+    \item A sequential PF to UKF algorithm is well-suited to potentially detumble after firing to reduce computation time.
+\end{enumerate}
 
 \subsection{First Version of My Focus Statement (F9)}
 \textit{[Your own version, before any AI help.]}
