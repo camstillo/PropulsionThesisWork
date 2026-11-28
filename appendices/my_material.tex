@@ -142,11 +142,12 @@ I think that the summaries were not helpful in comparison to just reading the pa
 
 \subsection{Synthesis Matrix and Argument Outline (F7)}
 
-\textbf{Topic: Power generation can be scheduled to handle changing orbital conditions (no AI used)}
+\textbf{Topic: Power generation can be scheduled to handle changing orbital conditions }
 
-\begin{longtable}{@{}p{0.08\linewidth}p{0.24\linewidth}p{0.13\linewidth}p{0.12\linewidth}p{0.15\linewidth}p{0.15\linewidth}@{}}
+{\footnotesize\setlength{\tabcolsep}{3pt}
+\begin{longtable}{@{}p{0.06\linewidth}p{0.20\linewidth}p{0.16\linewidth}p{0.10\linewidth}p{0.09\linewidth}p{0.11\linewidth}p{0.12\linewidth}p{0.05\linewidth}@{}}
   \toprule
-    Paper & Approach & Baseline & Metric & Result & Limitation \\
+    Paper & Approach & Dataset / Benchmark & Baseline & Metric & Result & Limitation & Verified \\
   \midrule
   \endhead
     \cite{husseinOptimizedLoadSchedulingAlgorithm2023} & 
@@ -157,10 +158,12 @@ I think that the summaries were not helpful in comparison to just reading the pa
         \item Place different loads into different categories by time, magnitude, or time and magnitude\strut
     \end{itemize}
     \end{minipage} &
+    Simulation only (MATLAB, problem-based). One day $=$ 12 orbits $\times$ 60 slots of 2 min, $T_{orb} = 120$ min. VHF downlink, $B = 20$ kHz; 10 W average generation; COM 4.4 W plus four fixed loads. Available-energy profile is an input, not modeled &
     Compared to timing based communication approach &
     BER, energy consumed, data rate&
     significantly reduced BER over naive approach &
-    Model of other satellite loads and power generation is extremely simple \\
+    Model of other satellite loads and power generation is extremely simple & 
+    yes \\
     \addlinespace
 
     \cite{akarneSelfAdaptiveEnergyAwarePower2026} & 
@@ -172,10 +175,12 @@ I think that the summaries were not helpful in comparison to just reading the pa
         \item Accounts for future power generation and loading\strut
     \end{itemize}
     \end{minipage} &
+    Simulation only (MATLAB/Simulink orbital simulator, $\Delta t = 120$ s, seeded \texttt{rng(42)}). 3U CubeSat in a circular LEO at 500 km. Two profiles: nominal orbit and high-demand payload bursts; SOH propagated out to $\approx$2 years; 100-run Monte Carlo robustness study &
     Compared to bare MPC approach &
     Battery SOC, Battery SOH, residual power & 
     4\% improvement on SOH over 2-year period and increased residual power available in eclipse & 
-    Doesn't actually simulate over multiple orbits; no estimators of system parameters from noisy measurements \\
+    Doesn't actually simulate over multiple orbits; no estimators of system parameters from noisy measurements & 
+    yes \\
     \addlinespace
     
     \cite{doff-sottaSpacecraftEnergyManagement2022} & 
@@ -188,17 +193,21 @@ I think that the summaries were not helpful in comparison to just reading the pa
         \item Optimization is meant to maximize power allocated to secondary tasks while taking into account necessary loads.\strut
     \end{itemize}
     \end{minipage} &
+    Simulation only (CVX with the Mosek solver). Eutelsat 172B-class GEO telecom spacecraft case study; $\delta = 50$ s sampling, horizon $N = 1728$ (one 24 h orbit), three successive orbits simulated, plus a battery charging-efficiency mismatch study &
     Compared to bare MPC approach &
     Battery stored energy and computation time&
     Improvement on battery storage over singular orbit &
-    Doesn't take into account any real measurements in the satellite; I don't really trust that the measurements the paper presents would be accurate in space. \\
+    Doesn't take into account any real measurements in the satellite; I don't really trust that the measurements the paper presents would be accurate in space. & 
+    yes \\
   \bottomrule
-\end{longtable}
+\end{longtable}}
 
-\textbf{Topic: Pointing can be optimized for time or power (no AI used)} 
-\begin{longtable}{@{}p{0.08\linewidth}p{0.24\linewidth}p{0.13\linewidth}p{0.12\linewidth}p{0.15\linewidth}p{0.15\linewidth}@{}}
+\textbf{Topic: Pointing can be optimized for time or power} 
+
+{\footnotesize\setlength{\tabcolsep}{3pt}
+\begin{longtable}{@{}p{0.06\linewidth}p{0.20\linewidth}p{0.16\linewidth}p{0.10\linewidth}p{0.09\linewidth}p{0.11\linewidth}p{0.12\linewidth}p{0.05\linewidth}@{}}
   \toprule
-    Paper & Approach & Baseline & Metric & Result & Limitation \\
+    Paper & Approach & Dataset / Benchmark & Baseline & Metric & Result & Limitation & Verified \\
   \midrule
   \endhead
     \cite{zhangFinitetimeAttitudeSetpoint2020} & 
@@ -209,10 +218,12 @@ I think that the summaries were not helpful in comparison to just reading the pa
         \item Assume a large satellite that has the capability of making a multi-burn orbital transfer.\strut
     \end{itemize}
     \end{minipage} &
+    Simulation only, one rendezvous case. Target $a = 27500$ km, $e = 0.12$, $i = 50^\circ$; chaser $a = 7800$ km, $e = 0.2$, $i = 45^\circ$ (non-coplanar), 400 kg, $t_f = 10000$ s. IPSO run with 40 particles, 1000 iterations. No code or data released &
     Not compared against other techniques &
     Time and accuracy of the maneuver (did the chaser meet the rendezvous?) & 
     Successful implemention over a single multi-transfer maneuver&  
-    No actual optimality; Only solve for optimized-time pointing maneuver \\
+    No actual optimality; Only solve for optimized-time pointing maneuver & 
+    yes \\
     \addlinespace
     \cite{kristiansenEnergyOptimalAttitude2024} & 
     \begin{minipage}[t]{\linewidth}
@@ -222,17 +233,21 @@ I think that the summaries were not helpful in comparison to just reading the pa
         \item Included eclipse period in optimization formulation solved with IPOPT and CasADi.\strut
    \end{itemize}
    \end{minipage} &
+    Simulation only. HYPSO-2 6U CubeSat with deployable solar arrays in LEO; seven-task scenario (imaging slews, Svalbard and Nigeria downlinks, eclipse idle) spanning just over one orbit. IPOPT in CasADi, RK4 multiple shooting &
     Proportional-Derivative controller doing the same task &
     Final pointing error and increase in energy generation & 
     39\% increase in energy generation while meeting pointing spec. &  
-    Not feasible for real-time applications; not well-suited for propulsive maneuvers \\
+    Not feasible for real-time applications; not well-suited for propulsive maneuvers & 
+    yes \\
   \bottomrule
-\end{longtable}
+\end{longtable}}
 
-\textbf{Topic: Particle filters can be used to estimate attitude of a spacecraft (no AI used)} 
-\begin{longtable}{@{}p{0.08\linewidth}p{0.24\linewidth}p{0.13\linewidth}p{0.12\linewidth}p{0.15\linewidth}p{0.15\linewidth}@{}}
+\textbf{Topic: Particle filters can be used to estimate attitude of a spacecraft} 
+
+{\footnotesize\setlength{\tabcolsep}{3pt}
+\begin{longtable}{@{}p{0.06\linewidth}p{0.20\linewidth}p{0.16\linewidth}p{0.10\linewidth}p{0.09\linewidth}p{0.11\linewidth}p{0.12\linewidth}p{0.05\linewidth}@{}}
   \toprule
-    Paper & Approach & Baseline & Metric & Result & Limitation \\
+    Paper & Approach & Dataset / Benchmark & Baseline & Metric & Result & Limitation & Verified \\
   \midrule
   \endhead
     \cite{xue-yuanjiangSpacecraftAttitudeEstimation2005} & 
@@ -242,12 +257,13 @@ I think that the summaries were not helpful in comparison to just reading the pa
         \item Develop model of spacecraft attitude which handles tumbling and any rotation.\strut
     \end{itemize}
     \end{minipage} &
+    Simulation only, two initialization cases. TAM noise $(300\ \mathrm{nT})^2$ at 10 s, gyro and filter at 0.2 s, 10th-order IGRF reference, gyro bias 0.1 deg/h. Case 1 initial error $2^\circ$/axis; case 2 $[-50, 50, 160]^\circ$. Dual PF with $N = 1500$. Orbit, epoch, and Monte Carlo run count never stated &
     Unscented Kalman Filter using the same model & 
     Convergence time and initial attitude covariance &
     Inproved convergence time for high-uncertainty systems &
-    No baseline error calculation against absolute attitude error; doesn't account for propulsion \\
+    No baseline error calculation against absolute attitude error; doesn't account for propulsion & yes \\
   \bottomrule
-\end{longtable}
+\end{longtable}}
 
 \subsection{Argument Outline} 
 \textbf{Themes:}

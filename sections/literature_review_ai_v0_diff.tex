@@ -13,7 +13,7 @@
 
 \section{Literature Review}
 
-Integrating a water-based resistojet onto a resource-constrained CubeSat requires coordinating electrical power allocation, attitude slewing, and state estimation across changing orbital conditions. Unlike larger spacecraft whose buses power thrusters directly, a CubeSat using a phase-change material (PCM) thermal battery must accumulate thermal energy gradually before executing an orbital burn. \DIFaddbegin \DIFadd{The goal is to minimize time to burn required while maintaining the pointing requirements associated with firing. In addition, some form of backup tumbling estimation in the post-burn period is useful to determine if another firing will be potentially dangerous. }\DIFaddend Reviewing existing literature across power scheduling, attitude optimization, and attitude estimation reveals both foundational methods and critical gaps for low-power propulsive CubeSats.
+Integrating a water-based resistojet onto a resource-constrained CubeSat requires coordinating electrical power allocation, attitude slewing, and state estimation across changing orbital conditions. Unlike larger spacecraft whose buses power thrusters directly, a CubeSat using a phase-change material (PCM) thermal battery must accumulate thermal energy gradually before executing an orbital burn. \DIFaddbegin \DIFadd{The goal is to minimize the time required to reach a burn while maintaining the pointing requirements associated with firing. In addition, some form of backup tumbling estimation in the post-burn period is useful to determine whether another firing would be dangerous. }\DIFaddend Reviewing existing literature across power scheduling, attitude optimization, and attitude estimation reveals both foundational methods and critical gaps for low-power propulsive CubeSats.
 
 \DIFdelbegin \subsection{\DIFdel{Power Scheduling Under Changing Orbital Conditions}}
 %DIFAUXCMD
@@ -21,45 +21,106 @@ Integrating a water-based resistojet onto a resource-constrained CubeSat require
 %DIFDELCMD < 
 
 %DIFDELCMD < %%%
-\DIFdelend Power scheduling tasks are structured by the mission's optimization objective: maximizing power to a primary load, maximizing available bus power at any instant, minimizing battery degradation over time, or minimizing unused solar power. Because solar illumination and eclipse durations vary across orbits, power allocation can be treated as a separate optimization task that adapts to changing orbital conditions.
+\DIFdel{Power scheduling tasks are structured by the mission's optimization objective: maximizing power to a primary load, maximizing available bus power at any instant, minimizing battery degradation over time, or minimizing unused solar power. Because solar illumination and eclipse durations vary across orbits, power allocation can be treated as a separate optimization task that adapts to changing orbital conditions.
+}%DIFDELCMD < 
 
-For communication-focused CubeSats, \cite{husseinOptimizedLoadSchedulingAlgorithm2023} formulates a fixed-horizon load-scheduling algorithm that classifies loads by time, magnitude, or combined time-and-magnitude modulation, alongside fixed loads. Across $12$ orbits per day divided into two-minute slots, the scheduler modulates transmitter power to maximize downlink data rate and minimize bit error rate (BER) when channel quality is high. Compared to a timing-based baseline transmitting continuously at $4.4\text{ W}$ ($80\text{ b/s}$), \cite{husseinOptimizedLoadSchedulingAlgorithm2023} increases data rate to $144.6\text{ b/s}$ and reduces minimum BER to $3.40 \times 10^{-17}$. Despite minimizing BER, the model of power generation and non-communication loads in \cite{husseinOptimizedLoadSchedulingAlgorithm2023} is simplistic for changing orbital conditions. All non-communication subsystems---including the attitude determination and control system (ADCS)---are treated as fixed loads, ignoring pointing and slewing power demands. Moreover, \cite{husseinOptimizedLoadSchedulingAlgorithm2023} assumes a fixed communication payload scheduled at intervals that maximize ground-station line-of-sight, which does not hold for \DIFdelbegin \DIFdel{an amateur radio (AMSAT) mission where discrete packet }\DIFdelend \DIFaddbegin \DIFadd{these mission requirements where transmission }\DIFaddend bursts arrive randomly and continuously from operators worldwide. 
+%DIFDELCMD < %%%
+\DIFdel{For communication-focused CubeSats, \mbox{%DIFAUXCMD
+\cite{husseinOptimizedLoadSchedulingAlgorithm2023} }\hskip0pt%DIFAUXCMD
+formulates a fixed-horizon load-scheduling algorithm that classifies loads by time, magnitude, or combined time-and-magnitude modulation, alongside fixed loads. Across $12$ orbits per day divided into two-minute slots, the scheduler modulates transmitter power to maximize downlink data rate and minimize bit error rate (BER) when channel quality is high. Compared to a timing-based baseline transmitting continuously at $4.4\text{ W}$ ($80\text{ b/s}$), \mbox{%DIFAUXCMD
+\cite{husseinOptimizedLoadSchedulingAlgorithm2023} }\hskip0pt%DIFAUXCMD
+increases data rate to $144.6\text{ b/s}$ and reduces minimum BER to $3.40 \times 10^{-17}$. Despite minimizing BER, the model of power generation and non-communication loads in \mbox{%DIFAUXCMD
+\cite{husseinOptimizedLoadSchedulingAlgorithm2023} }\hskip0pt%DIFAUXCMD
+is simplistic for changing orbital conditions. All non-communication subsystems---including the attitude determination and control system (ADCS)---are treated as fixed loads, ignoring pointing and slewing power demands. Moreover, \mbox{%DIFAUXCMD
+\cite{husseinOptimizedLoadSchedulingAlgorithm2023} }\hskip0pt%DIFAUXCMD
+assumes a fixed communication payload scheduled at intervals that maximize ground-station line-of-sight, which does not hold for an amateur radio (AMSAT) mission where discrete packet bursts arrive randomly and continuously from operators worldwide.
 %DIF <  [NOTE/QUESTION FOR AUTHOR on Hussein et al. (2023)]: In your outline, you mention that power scheduling tasks can "minimize unused power" and "minimize battery degradation over time." Note that in Hussein et al.'s cost function, the weight on energy consumption (\omega_3) is set to zero in their simulations (energy is only enforced as an inequality constraint), and battery aging/degradation is not modeled (that appears in Akarne et al., 2026). Also, Hussein et al. relax their binary decision variable u_i \in {0,1} to a continuous interval [0,1], whereas real CubeSat hardware typically has discrete power modes.
+}%DIFDELCMD < 
 
-To improve computational speed across coupled subsystems, \cite{doff-sottaSpacecraftEnergyManagement2022} implements a fully convex formulation of the spacecraft power problem that maximizes power allocated to secondary tasks while respecting battery state-of-charge (SOC) and thermal bounds. By introducing a slack variable for battery charging losses and assuming that heat generation and external fluxes are known beforehand, \cite{doff-sottaSpacecraftEnergyManagement2022} transforms nonlinear constraints into convex constraints that solve in roughly $2\text{ s}$ per single-orbit horizon. While understanding how constraints can be made convex is useful, \cite{doff-sottaSpacecraftEnergyManagement2022} models a large geostationary satellite on the order of $35\text{ kW}$ power allocation ($37.8\text{ kW}$ maximum load, $3551\text{ kg}$ mass) and assumes solar panels generate more energy than onboard batteries can store. Furthermore, the formulation omits real sensor measurements, control over individual loads, and slewing constraints, all of which are required when maximizing power to a CubeSat thruster load.
+%DIFDELCMD < %%%
+\DIFdel{To improve computational speed across coupled subsystems, \mbox{%DIFAUXCMD
+\cite{doff-sottaSpacecraftEnergyManagement2022} }\hskip0pt%DIFAUXCMD
+implements a fully convex formulation of the spacecraft power problem that maximizes power allocated to secondary tasks while respecting battery state-of-charge (SOC) and thermal bounds. By introducing a slack variable for battery charging losses and assuming that heat generation and external fluxes are known beforehand, \mbox{%DIFAUXCMD
+\cite{doff-sottaSpacecraftEnergyManagement2022} }\hskip0pt%DIFAUXCMD
+transforms nonlinear constraints into convex constraints that solve in roughly $2\text{ s}$ per single-orbit horizon. While understanding how constraints can be made convex is useful, \mbox{%DIFAUXCMD
+\cite{doff-sottaSpacecraftEnergyManagement2022} }\hskip0pt%DIFAUXCMD
+models a large geostationary satellite on the order of $35\text{ kW}$ power allocation ($37.8\text{ kW}$ maximum load, $3551\text{ kg}$ mass) and assumes solar panels generate more energy than onboard batteries can store. Furthermore, the formulation omits real sensor measurements, control over individual loads, and slewing constraints, all of which are required when maximizing power to a CubeSat thruster load.
 %DIF <  [NOTE/QUESTION FOR AUTHOR on Doff-Sotta et al. (2022)]: In your synthesis matrix and outline, you wrote that Doff-Sotta et al. is "Fully open-loop: doesn't really control for anything except battery SOC and temperature" and listed its baseline as "Compared to bare MPC approach." Checking the paper (Sections 3.2 and 4.4), Doff-Sotta et al. formulate a convex Open-Loop Optimal Control Problem (OOCP) and solve it repeatedly at each sampling step as a closed-loop receding-horizon MPC law (Algorithm 1); in Section 4.4 (Figs. 12 and 14), their baseline comparison benchmarks their closed-loop MPC against the purely open-loop application of the initial (k=0) OOCP solution under parameter uncertainty. However, your point that the orbital position, attitude trajectory, and external temperatures (T_b, T_s) are precomputed in open loop outside the convex optimizer (Eqs. 47-74) without sensor feedback or state estimation is completely valid. You may want to clarify in your matrix whether you mean open-loop trajectory/thermal precomputation or the OOCP baseline comparison.
+}%DIFDELCMD < 
 
-\DIFdelbegin \subsection{\DIFdel{Adaptive Multi-Load Power Management for Thermal Battery Charging}}
+%DIFDELCMD < %%%
+\subsection{\DIFdel{Adaptive Multi-Load Power Management for Thermal Battery Charging}}
 %DIFAUXCMD
 \addtocounter{subsection}{-1}%DIFAUXCMD
 %DIFDELCMD < 
 
 %DIFDELCMD < %%%
-\DIFdelend This mission is specifically well-suited for power scheduling because its goal is to optimize over multiple load conditions to maximize available power up to the propulsion burn. The propulsion system must be fed all available power to phase-change the PCM in as little time as possible; from experiments, reaching operating temperature takes at least two hours at \DIFdelbegin \DIFdel{maximum power.
+\DIFdelend This mission is specifically well-suited for power scheduling because its goal is to \DIFdelbegin \DIFdel{optimize over multiple load conditions to }\DIFdelend maximize available power \DIFaddbegin \DIFadd{over various load conditions }\DIFaddend up to the propulsion burn. The propulsion system must be fed all available power to phase-change the \DIFdelbegin \DIFdel{PCM }\DIFdelend \DIFaddbegin \DIFadd{material }\DIFaddend in as little time as possible\DIFdelbegin \DIFdel{; from }\DIFdelend \DIFaddbegin \DIFadd{. From }\DIFaddend experiments, reaching operating temperature takes at least two hours at \DIFdelbegin \DIFdel{maximum power.
 %DIF <  [QUESTION FOR AUTHOR]: The statement that heating the PCM takes "at least 2 hours at maximum power to get to temperature" comes from your experimental notes in the outline rather than the six cited papers. Would you like to specify the exact wattage corresponding to "maximum power" in those experiments (e.g., <10 W bus power or 20-50 W heater power from Section 1/Heilmeier Q2) to connect the 2-hour duration to the latent heat of the LiF-LiOH salt?
-}\DIFdelend \DIFaddbegin \DIFadd{the maximum heater power at 40W, around the order of a single orbit in LEO. 
+}\DIFdelend \DIFaddbegin \DIFadd{the maximum heater power of 40 W, on the order of a single orbit in LEO. Given that CubeSat power budgets are well under the maximum available heater power \mbox{%DIFAUXCMD
+\cite{clarkHugePowerDemandItsyBitsy2010}}\hskip0pt%DIFAUXCMD
+, keeping the satellite generally operational over multiple orbits while charging is critical.
 }\DIFaddend 
 
-To manage multiple time- and magnitude-varying loads while maximizing battery SOC and minimizing battery wear, \cite{akarneSelfAdaptiveEnergyAwarePower2026} develops a self-adaptive model predictive control (MPC) algorithm for CubeSat power systems. Using a Sparrow Search Algorithm (SSA) to iteratively tune the MPC time horizon and cost weights online across varying solar generation, loading, and eclipse states, \cite{akarneSelfAdaptiveEnergyAwarePower2026} improves battery state of health (SOH) by $4\%$ over a two-year period ($12,000$ orbits) and increases eclipse residual power compared to a fixed-parameter MPC baseline. Nevertheless, \cite{akarneSelfAdaptiveEnergyAwarePower2026} lacks a probabilistic model of radio transmission \DIFdelbegin \DIFdel{for AMSAT needs}\DIFdelend \DIFaddbegin \DIFadd{which is better suited for the problem}\DIFaddend , omits estimators for noisy measurements, and does not simulate an orbital change from a thruster burn. Even so, its adaptive MPC formulation could be expanded to include the thermal battery load and PCM degradation alongside the electrical battery. 
-%DIF <  [NOTE FOR AUTHOR on Akarne et al. (2026)]: In your synthesis matrix, the limitation cell notes "Doesn't actually simulate over multiple orbits," whereas your Citeable Notes and running notes cite their 2-year (12,000-orbit) SOH simulation. Specifically, Akarne et al. run single-orbit simulations for detailed SOC/temperature waveforms and 12,000 orbits for SOH aging, but the orbital geometry itself (60 min sun / 30 min eclipse) remains static rather than evolving across an orbital transfer.
+\DIFdelbegin \DIFdel{To manage multiple time- and magnitude-varying loads while maximizing battery SOC and minimizing battery wear, \mbox{%DIFAUXCMD
+\cite{akarneSelfAdaptiveEnergyAwarePower2026} }\hskip0pt%DIFAUXCMD
+develops a }\DIFdelend \DIFaddbegin \DIFadd{Several works focus on optimizing satellite loads over long horizons, attempting to maximize available power, battery life, or stored energy. Essentially all formulations of power delivery systems adapt which loads receive power through load scheduling. Communication-focused CubeSats may benefit from fixed-horizon scheduling when the load and transmission conditions are well understood. In the case of communications, favorable channel conditions may make it worthwhile to drive transmit power up during certain periods in order to minimize the bit error rate (BER) \mbox{%DIFAUXCMD
+\cite{husseinOptimizedLoadSchedulingAlgorithm2023}}\hskip0pt%DIFAUXCMD
+. Contrast this with load conditions that are unknown in the future. A }\DIFaddend self-adaptive \DIFdelbegin \DIFdel{model predictive }\DIFdelend \DIFaddbegin \DIFadd{model-predictive }\DIFaddend control (MPC) algorithm \DIFdelbegin \DIFdel{for CubeSat power systems. Using a Sparrow Search Algorithm (SSA) to iteratively tune the MPC time horizon and cost weights online across varying solar generation, loading, and eclipse states, \mbox{%DIFAUXCMD
+\cite{akarneSelfAdaptiveEnergyAwarePower2026} }\hskip0pt%DIFAUXCMD
+improves }\DIFdelend \DIFaddbegin \DIFadd{can instead manage multiple loads, taking into account future power generation and loading conditions in different parts of the orbit \mbox{%DIFAUXCMD
+\cite{akarneSelfAdaptiveEnergyAwarePower2026}}\hskip0pt%DIFAUXCMD
+. Part of the unique value of the MPC method is that it adapts to varying CubeSat mission goals. For example, MPC parameters can be tuned over an orbit to optimize for energy storage or }\DIFaddend battery state of health (SOH) \DIFdelbegin \DIFdel{by $4\%$ over a two-year period ($12,000$ orbits) and increases eclipse residual power compared to a fixed-parameter MPC baseline. Nevertheless, \mbox{%DIFAUXCMD
+\cite{akarneSelfAdaptiveEnergyAwarePower2026} }\hskip0pt%DIFAUXCMD
+lacks a probabilistic model of radio transmission for AMSAT needs, omits estimators for noisy measurements, and does not simulate an orbital change from a thruster burn. Even so, its adaptive MPC formulation could be expanded to include the thermal battery load and PCM degradation alongside the electrical battery. %DIF <  [NOTE FOR AUTHOR on Akarne et al. (2026)]: In your synthesis matrix, the limitation cell notes "Doesn't actually simulate over multiple orbits," whereas your Citeable Notes and running notes cite their 2-year (12,000-orbit) SOH simulation. Specifically, Akarne et al. run single-orbit simulations for detailed SOC/temperature waveforms and 12,000 orbits for SOH aging, but the orbital geometry itself (60 min sun / 30 min eclipse) remains static rather than evolving across an orbital transfer.
+}\DIFdelend \DIFaddbegin \DIFadd{\mbox{%DIFAUXCMD
+\cite{akarneSelfAdaptiveEnergyAwarePower2026}}\hskip0pt%DIFAUXCMD
+. Part of the challenge of load scheduling is the computation required to estimate the best load schedule beforehand. Other work focuses on computational speed across coupled subsystems, implementing a fully convex formulation of a similar problem \mbox{%DIFAUXCMD
+\cite{doff-sottaSpacecraftEnergyManagement2022}}\hskip0pt%DIFAUXCMD
+. The drawback to this formulation is its limited ability to adapt to changing conditions.
+}\DIFaddend 
 
 \DIFdelbegin \subsection{\DIFdel{Attitude Pointing Optimization for Time Versus Power}}
 %DIFAUXCMD
 \addtocounter{subsection}{-1}%DIFAUXCMD
-%DIFDELCMD < 
+\DIFdelend \DIFaddbegin \DIFadd{In the case of this mission, much of this work falls short of the needs of an average CubeSat and the goals of the propulsion mission. Work that optimizes for a specific payload tends to lump all non-payload power into a ``fixed-load'' category \mbox{%DIFAUXCMD
+\cite{husseinOptimizedLoadSchedulingAlgorithm2023}}\hskip0pt%DIFAUXCMD
+. Any method that does not predict future loading may suffer when increased demand forces increased draw. Some power management schemes do not even use feedback in the control loop, in order to minimize the complexity of the power management method. Predictions of power generation and load availability are instead made from an estimated orbit, assuming no errors in the model \mbox{%DIFAUXCMD
+\cite{doff-sottaSpacecraftEnergyManagement2022}}\hskip0pt%DIFAUXCMD
+. Maintaining a steady supply of energy even through eclipse conditions is important here, as having to shut off the heating element during every eclipse would increase charge times. Methods which iteratively predict power usage and generation over time are much more successful at maintaining a load over a long period of time \mbox{%DIFAUXCMD
+\cite{akarneSelfAdaptiveEnergyAwarePower2026}}\hskip0pt%DIFAUXCMD
+.
+}\DIFaddend 
 
-%DIFDELCMD < %%%
-\DIFdelend Because the thruster is aligned with a single spacecraft axis, firing requires slewing into the thrust direction\DIFdelbegin \DIFdel{, while }\DIFdelend \DIFaddbegin \DIFadd{. Additionally, }\DIFaddend communication and solar charging \DIFdelbegin \DIFdel{also demand slewing }\DIFdelend \DIFaddbegin \DIFadd{demand slewing that may not align}\DIFaddend . The optimal pointing solution admits a direct decoupled solution when maneuver time is the objective, but requires a nonlinear optimization schedule when maximum power is desired.
+\DIFdelbegin \DIFdel{Because the thruster is }\DIFdelend \DIFaddbegin \DIFadd{Turning to the thruster itself, any burn will be }\DIFaddend aligned with a single spacecraft axis, \DIFdelbegin \DIFdel{firing requires slewing into the thrust direction, while communicationand solar chargingalso demand slewing. The optimal pointing solution admits a direct decoupled solution when maneuver time is the objective, but requires a nonlinear optimization schedule when maximum power is desired}\DIFdelend \DIFaddbegin \DIFadd{so communication, solar charging, and firing are potentially at odds. The goal for this mission is to maximize power generation during multiple orbits while meeting the pointing goals required by a single-axis thruster}\DIFaddend .
 
-For time-constrained maneuvers, \cite{zhangFinitetimeAttitudeSetpoint2020} shows that once orbital burns are determined, the pointing objective can be solved separately. For a single-thruster spacecraft executing a four-burn rendezvous across non-concentric orbits, \cite{zhangFinitetimeAttitudeSetpoint2020} solves for burn times and $\Delta v$ vectors using an Improved Particle Swarm Optimization (IPSO) algorithm, and tracks the required attitude set-points in finite time using a Lyapunov-based controller on $\text{SO}(3)$. However, PSO is heuristic and does not guarantee a global optimum. Furthermore, \cite{zhangFinitetimeAttitudeSetpoint2020} models a large $400\text{ kg}$ satellite over a single transfer without maintaining optimal sun-pointing at all times, whereas a \DIFdelbegin \DIFdel{low-thrust }\DIFdelend CubeSat may require multiple burns while maintaining sun-pointing to sustain bus power.
-%DIF <  [NOTE/QUESTION FOR AUTHOR on Zhang et al. (2020)]: In your Citeable Notes and Argument Outline, you wrote that once burn timing and \Delta v are found via PSO, "the pointing solution can be solved in closed form using the method of multipliers. They solve this with a lyapunov function" and "the power-minimizing pointing objective can be found using a closed-form solution." Looking closely at Zhang et al. (2020):
+\DIFdelbegin \DIFdel{For time-constrained maneuvers, \mbox{%DIFAUXCMD
+\cite{zhangFinitetimeAttitudeSetpoint2020} }\hskip0pt%DIFAUXCMD
+shows that once orbital burns are determined, the pointing objective can be solved separately}\DIFdelend \DIFaddbegin \DIFadd{Optimal slewing has been demonstrated for both optimal-time and optimal-power formulations}\DIFaddend . For a single-thruster spacecraft \DIFdelbegin \DIFdel{executing a four-burn rendezvous }\DIFdelend \DIFaddbegin \DIFadd{maneuvering }\DIFaddend across non-concentric orbits, \DIFdelbegin \DIFdel{\mbox{%DIFAUXCMD
+\cite{zhangFinitetimeAttitudeSetpoint2020} }\hskip0pt%DIFAUXCMD
+solves for burn times }\DIFdelend \DIFaddbegin \DIFadd{some work focuses on solving for burn locations }\DIFaddend and $\Delta v$ \DIFdelbegin \DIFdel{vectors using an Improved Particle Swarm Optimization (IPSO) algorithm, and tracks the required attitude set-points in finite time using a Lyapunov-based controller on $\text{SO}(3)$. However, PSO is heuristic and does not guarantee a global optimum. Furthermore, \mbox{%DIFAUXCMD
+\cite{zhangFinitetimeAttitudeSetpoint2020} }\hskip0pt%DIFAUXCMD
+models a large $400\text{ kg}$ satellite over a single transfer without maintaining optimal sun-pointing at all times, whereas a low-thrust CubeSat may require multiple burns while maintaining sun-pointing to sustain bus power. %DIF <  [NOTE/QUESTION FOR AUTHOR on Zhang et al. (2020)]: In your Citeable Notes and Argument Outline, you wrote that once burn timing and \Delta v are found via PSO, "the pointing solution can be solved in closed form using the method of multipliers. They solve this with a lyapunov function" and "the power-minimizing pointing objective can be found using a closed-form solution." Looking closely at Zhang et al. (2020):
 %DIF <    1. The method of multipliers (augmented Lagrangian, Eqs. 11-13) is actually used inside the PSO orbital transfer step to enforce terminal time and \Delta v constraints, whereas the attitude pointing step uses a coordinate-free Fast Terminal Sliding Mode Controller (FTSMC) on SO(3) (Eq. 27) proven finite-time stable via a Lyapunov function (Theorem 1).
 %DIF <    2. Their attitude controller is not explicitly formulated as a power-minimizing optimal control law (it tracks fixed attitude set-points in finite time), although in Section 2.3 (Eq. 18) the authors note that the free roll vector s_d orthogonal to the thrust axis can be chosen to align with the Sun direction or velocity vector.
 %DIF <    3. Also, in your synthesis matrix, the baseline for Zhang et al. is listed as "Not compared against other techniques," whereas your Citeable Notes correctly note that they benchmark Improved PSO against standard PSO (Tables 3-4). You may want to update that cell in your synthesis matrix so both sections agree!
+}%DIFDELCMD < 
 
-When maximum power is desired during slewing, \cite{kristiansenEnergyOptimalAttitude2024} builds on prior work \DIFaddbegin \DIFadd{\mbox{%DIFAUXCMD
-\cite{kristiansenEnergyOptimalAttitude2021} }\hskip0pt%DIFAUXCMD
-}\DIFaddend to formulate a nonlinear optimization that maximizes net solar energy while slewing to communication and payload targets, accounting for eclipses and reaction wheel and magnetorquer dynamics. Solved with IPOPT and CasADi, \cite{kristiansenEnergyOptimalAttitude2024} generates \DIFdelbegin \DIFdel{$39\%$ (}\DIFdelend $\approx 40\%$ \DIFdelbegin \DIFdel{) }\DIFdelend more energy over the maneuver than a baseline proportional-derivative (PD) controller while meeting pointing specifications. Although their actuator models help balance ADCS loading with propulsion heating, the nonlinear solver is infeasible for real-time onboard use and lacks a highly weighted propulsive objective to slew the satellite into the velocity direction at the highest-velocity orbital point.
+%DIFDELCMD < %%%
+\DIFdel{When maximum power is desired during slewing, \mbox{%DIFAUXCMD
+\cite{kristiansenEnergyOptimalAttitude2024} }\hskip0pt%DIFAUXCMD
+builds on prior work to formulate }\DIFdelend \DIFaddbegin \DIFadd{requirements, which then drive pointing decisions. One method utilizes a heuristic optimization (particle swarm optimization) that reduces the optimal-time pointing formulation to a comparatively simple problem \mbox{%DIFAUXCMD
+\cite{zhangFinitetimeAttitudeSetpoint2020}}\hskip0pt%DIFAUXCMD
+. Maximizing power during slewing is significantly more complex, as a solver must take into account pointing goals that are at odds with each other while minimizing control action. The result is }\DIFaddend a nonlinear optimization \DIFdelbegin \DIFdel{that maximizes net solar energy while slewing to communication and payload targets, accounting for eclipses and reaction wheel and magnetorquer dynamics. Solved with IPOPT and CasADi, \mbox{%DIFAUXCMD
+\cite{kristiansenEnergyOptimalAttitude2024} }\hskip0pt%DIFAUXCMD
+generates $39\%$ (}\DIFdelend \DIFaddbegin \DIFadd{formulation that generates }\DIFaddend $\approx 40\%$ \DIFdelbegin \DIFdel{) more energy over }\DIFdelend \DIFaddbegin \DIFadd{more energy during }\DIFaddend the maneuver than a \DIFdelbegin \DIFdel{baseline proportional-derivative (PD ) controller while meeting pointing specifications.
+Although their actuator models help balance ADCS loading with propulsion heating, the nonlinear solver is infeasible for real-time onboard use and lacks a highly weighted propulsive objective to slew the satellite into the velocity direction at the highest-velocity orbital point.
+}\DIFdelend \DIFaddbegin \DIFadd{PD controller \mbox{%DIFAUXCMD
+\cite{kristiansenEnergyOptimalAttitude2024}}\hskip0pt%DIFAUXCMD
+\mbox{%DIFAUXCMD
+\cite{kristiansenEnergyOptimalAttitude2021}}\hskip0pt%DIFAUXCMD
+.
+}\DIFaddend 
 
 \DIFdelbegin \subsection{\DIFdel{Sequential Attitude Estimation and Summary of the Literature Gap}}
 %DIFAUXCMD
@@ -67,19 +128,32 @@ When maximum power is desired during slewing, \cite{kristiansenEnergyOptimalAtti
 %DIFDELCMD < 
 
 %DIFDELCMD < %%%
-\DIFdelend To estimate attitude during post-burn tumbling, \cite{xue-yuanjiangSpacecraftAttitudeEstimation2005} utilizes gyroscope and three-axis magnetometer (TAM) measurements in a particle filter (PF) parameterized with Generalized Rodrigues Parameters (GRPs) and quaternions. Compared against an Unscented Kalman Filter (UKF) using the same model, \cite{xue-yuanjiangSpacecraftAttitudeEstimation2005} shows that the PF converges faster for large initial errors, though the work is a demonstration that never checks against absolute error, omits computational cost comparisons, and leaves key PF features unexplained. This motivates a sequential PF-to-UKF algorithm to detumble after firing while reducing computation time, extended with orbital or GPS estimation.
+\DIFdel{To estimate attitude during }\DIFdelend \DIFaddbegin \DIFadd{The last key to ensuring propulsive burn reliability is }\DIFaddend post-burn tumbling \DIFdelbegin \DIFdel{, \mbox{%DIFAUXCMD
+\cite{xue-yuanjiangSpacecraftAttitudeEstimation2005} }\hskip0pt%DIFAUXCMD
+utilizes gyroscope }\DIFdelend \DIFaddbegin \DIFadd{estimation. Gyroscopes }\DIFaddend and three-axis magnetometer\DIFaddbegin \DIFadd{s}\DIFaddend  (TAM) \DIFdelbegin \DIFdel{measurements in a particle filter (PF) parameterized with Generalized Rodrigues Parameters (GRPs) and quaternions. Compared against an Unscented Kalman Filter }\DIFdelend \DIFaddbegin \DIFadd{are nearly universal on CubeSats, and an unscented Kalman filter }\DIFaddend (UKF) \DIFdelbegin \DIFdel{using the same model, \mbox{%DIFAUXCMD
+\cite{xue-yuanjiangSpacecraftAttitudeEstimation2005} }\hskip0pt%DIFAUXCMD
+shows that the PFconverges faster for }\DIFdelend \DIFaddbegin \DIFadd{or particle filter (PF) can use their measurements for attitude state estimation over an orbit. For }\DIFaddend large initial errors, \DIFdelbegin \DIFdel{though the work is a demonstration that never checks against absolute error, omits computational cost comparisons, and leaves key PF features unexplained}\DIFdelend \DIFaddbegin \DIFadd{it has been shown that the PF converges faster than a UKF on the same measurements, at the cost of computational complexity \mbox{%DIFAUXCMD
+\cite{xue-yuanjiangSpacecraftAttitudeEstimation2005}}\hskip0pt%DIFAUXCMD
+}\DIFaddend . This motivates a sequential PF-to-UKF algorithm to \DIFdelbegin \DIFdel{detumble }\DIFdelend \DIFaddbegin \DIFadd{estimate tumbling }\DIFaddend after firing while reducing computation time\DIFdelbegin \DIFdel{, extended with orbital or GPS estimation}\DIFdelend .
 
-
-\DIFdelbegin \DIFdel{Together, these works expose an explicit gap tied to the limits of current CubeSat practice (Heilmeier Question 2): a 3U CubeSat generates under $10\text{ W}$ of average power, whereas water vaporization demands substantial phase-change energy. A PCM thermal battery bridges this limit, yet prior works address load scheduling \mbox{%DIFAUXCMD
+\DIFdelbegin \DIFdel{Together, these works expose an explicit gap tied to the limits of current CubeSat }\DIFdelend \DIFaddbegin \DIFadd{The limit of current }\DIFaddend practice (Heilmeier \DIFdelbegin \DIFdel{Question 2) : a 3U CubeSat generates under $10\text{ W}$ of average power , whereas water vaporization demands substantial phase-change energy}\DIFdelend \DIFaddbegin \DIFadd{Q2) is that a CubeSat resistojet draws more instantaneous power than a 3U bus generates}\DIFaddend . A PCM thermal battery \DIFdelbegin \DIFdel{bridges this limit, yet prior works address load scheduling \mbox{%DIFAUXCMD
 \cite{husseinOptimizedLoadSchedulingAlgorithm2023,doff-sottaSpacecraftEnergyManagement2022,akarneSelfAdaptiveEnergyAwarePower2026}}\hskip0pt%DIFAUXCMD
 , attitude optimization \mbox{%DIFAUXCMD
 \cite{zhangFinitetimeAttitudeSetpoint2020,kristiansenEnergyOptimalAttitude2024}}\hskip0pt%DIFAUXCMD
 , and attitude estimation \mbox{%DIFAUXCMD
 \cite{xue-yuanjiangSpacecraftAttitudeEstimation2005} }\hskip0pt%DIFAUXCMD
-separately without integrating multi-hour PCM charging, random amateur-radio loads, sun-versus-thrust slewing , and }\DIFdelend \DIFaddbegin \DIFadd{This work suggests combining these techniques to maximize available power and usage during a planned burn maneuver. Based on simple $\Delta v$ calculations by the author, it will likely take several burns over multiple orbits to reach the larger orbits attempting to be acheived with this system. Based on the limited power budget of the class of satellite, these techniques will need to be used in tandem to maximize available charging power. The formulation posed in \mbox{%DIFAUXCMD
-\cite{akarneSelfAdaptiveEnergyAwarePower2026} }\hskip0pt%DIFAUXCMD
-can be modified to fit the loading and battery health requirements to maintain optimal temperatures and battery SOC over time. \mbox{%DIFAUXCMD
-\cite{kristiansenEnergyOptimalAttitude2024} }\hskip0pt%DIFAUXCMD
-demonstrates how a pointing maneuver can be formulated ahead of the burn which optimizes the slewing locations for both communications and power, and potentially generating more power than previously available. Finally, }\DIFaddend post-burn \DIFdelbegin \DIFdel{detumbling}\DIFdelend \DIFaddbegin \DIFadd{orbital estimation may require some tumbling and orbit re-establishment, for which \mbox{%DIFAUXCMD
+separately without integrating multi-hour PCM charging, random amateur-radio loads, sun-versus-thrust slewing, and post-burn detumbling}\DIFdelend \DIFaddbegin \DIFadd{removes that constraint by decoupling burn power from charge power (Heilmeier Q3), but it replaces an instantaneous power problem with a scheduling problem no reviewed work addresses. Multi-orbit, high-power charge events will require some scheme to handle the strain placed on the system and to leave residual power for the recovery. Scheduling work \mbox{%DIFAUXCMD
+\cite{akarneSelfAdaptiveEnergyAwarePower2026}}\hskip0pt%DIFAUXCMD
+\mbox{%DIFAUXCMD
+\cite{doff-sottaSpacecraftEnergyManagement2022}}\hskip0pt%DIFAUXCMD
+\mbox{%DIFAUXCMD
+\cite{husseinOptimizedLoadSchedulingAlgorithm2023} }\hskip0pt%DIFAUXCMD
+assumes fixed orbital geometry or does not carry the high-load condition of this system. Pointing work \mbox{%DIFAUXCMD
+\cite{zhangFinitetimeAttitudeSetpoint2020}}\hskip0pt%DIFAUXCMD
+\mbox{%DIFAUXCMD
+\cite{kristiansenEnergyOptimalAttitude2024}}\hskip0pt%DIFAUXCMD
+\mbox{%DIFAUXCMD
+\cite{kristiansenEnergyOptimalAttitude2021} }\hskip0pt%DIFAUXCMD
+manages optimal-time transfers or optimal-power scheduling, but carries no thrust objective and is not real-time feasible. Attitude estimation work \mbox{%DIFAUXCMD
 \cite{xue-yuanjiangSpacecraftAttitudeEstimation2005} }\hskip0pt%DIFAUXCMD
-demonstrates a method of using a particle filter to perform that state estimation that converges faster than a similar UKF implementation. Combining these methods and validating their utility to meet the goals of the specific application is the novelty of this work}\DIFaddend .
+proves out PF and UKF methods, but does not compare them against absolute error. Combining these methods and validating their utility to meet the goals of the specific application is the novelty of this work}\DIFaddend .
