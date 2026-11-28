@@ -19,6 +19,7 @@
   \midrule
   \endhead
   \textit{[claim]} & \textit{[experiment]} & \textit{[metric]} & \textit{[baseline, cited]} & \textit{[dataset]} \\
+   & &&& \\
   \bottomrule
 \end{longtable}
 
@@ -32,6 +33,23 @@
 
 \subsection{Code and Data}
 \textit{[F8: repository link and structure, environment, data storage, anything confidential.]}
+\tagpdfsetup{table/header-rows={1}}
+\begin{longtable}{@{}p{0.22\linewidth}p{0.2\linewidth}p{0.14\linewidth}p{0.18\linewidth}p{0.18\linewidth}@{}}
+  \toprule
+  Code Storage & Repo link\\
+  \midrule
+  \endhead
+    Particle Filter and UKF experiments & \href{https://github.com/camstillo/ParticleFilterAttitudeEstimator.git}{Github Link} \\
+    Power scheduler simulation & \href{https://github.com/camstillo/PowerSchedulerAlgorithms.git}{Github Link} \\
+    Pointing Optimization Code & \href{https://github.com/camstillo/PointingOptimizationCubesat.git}{Github Link} \\
+  \bottomrule
+\end{longtable}
+
+Currently, these don't have a directory structure, as the code hasn't necessarily been started on. These will eventually have a directory structure located in the README, but I usually tend to have a single folder with all supporting code (includes, etc.), a build folder for compilation, and a \texttt{main.c} file at the top level for compilation. Any dependencies will be consistently managed generally with a single version.
+ 
+For dependencies, I am planning on using IPOPT with MUMPS and BLAS. Versions of these will likely not change at all from the version that I'm currently using. I plan on using GNU Scientific Library (GSL) to handle some of the linear algebra stuff that I'll be doing with the code. Finally, \href{https://www.space-track.org/}{SpaceTrack.org} gives out an SGP4 orbit propagator for use with a C interface, which is what I plan on using for the orbital data simulator (version shouldn't change).
 
 \subsection{Ethics and Data Protection}
 \textit{[F8: 2 to 3 sentences: IRB status if you work with human subjects; privacy and export-control constraints; who may see your data.]}
+
+I am not going to be working with human subjects or anything involving privacy. None of the work I'm doing is export controllable, although I need to ensure to not include the SGP4 orbital propagator in any git repositories as that is not available 
